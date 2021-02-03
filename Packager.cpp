@@ -1,5 +1,5 @@
 /*
- * Transceiver.cpp
+ * Packager.cpp
  * @author        : Carlos Carrasquillo
  * @contact       : c.carrasquillo@ufl.edu
  * @date created  : November 11, 2020
@@ -12,21 +12,25 @@
 
 #include <iostream>
 #include <sstream>
-#include "Transceiver.h"
+#include "Packager.h"
 
-Transceiver::Transceiver() {
-
+void transmitByteTest(uint8_t data) {
+    std::cout << data << std::endl;
 }
 
-int Transceiver::getNumPackets(std::string &data) {
+Packager::Packager() {
+    //transceiver = new UHF_Transceiver();
+}
+
+int Packager::getNumPackets(std::string &data) {
     return (data.length() - 1)/ 256 + 1;
 }
 
-int Transceiver::getChecksum(std::string &data) {
+int Packager::getChecksum(std::string &data) {
     int sum = 0;
 
-    for (int i = 0; i < data.length(); i++) {
-        sum += (int)data[i];
+    for (char i : data) {
+        sum += (int)i;
     }
 
     std::stringstream ss;
@@ -34,7 +38,7 @@ int Transceiver::getChecksum(std::string &data) {
     return sum;
 }
 
-Transceiver::packet Transceiver::composePacket(std::string &data) {
+Packager::packet Packager::composePacket(std::string &data) {
     packet outbound;
     outbound.checksum = getChecksum(data);
     outbound.data_length = data.length();
@@ -44,18 +48,26 @@ Transceiver::packet Transceiver::composePacket(std::string &data) {
     return outbound;
 }
 
-int Transceiver::sendData(std::string &data) {
+int Packager::sendData(std::string &data) {
     int num_packets = getNumPackets(data);
 
     packet outbound;
     for (int i = 0; i < num_packets; i++) {
         std::string data_substr = data.substr(i*256, 256);
         outbound = composePacket(data_substr);
+        sendPacket(outbound);
+        //std::cout << "Outbound Data: " << outbound.data << std::endl;
+        //std::cout << "Outbound Data Length: " << outbound.data_length << std::endl;
 
-        std::cout << "Outbound Data: " << outbound.data << std::endl;
-        std::cout << "Outbound Data Length: " << outbound.data_length << std::endl;
     }
     std::cout << "Number of Packets: " << num_packets << std::endl;
 
     return 0;
 }
+
+int Packager::sendPacket(packet outbound) {
+    transmitByteTest((uint8_t)(outbound.preamble >> 8));
+    transmitByteTest((uint8_t)(outbound.preamble & 0xFF));
+    transmitByteTest((uint8_t)outbound.data_length);
+    return 0;
+};
