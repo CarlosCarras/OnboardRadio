@@ -12,17 +12,18 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "Packager.h"
 
 Packager::Packager() {
     transceiver = new UHF_Transceiver();
 }
 
-int Packager::getNumPackets(std::string &data) {
+int Packager::getNumPackets(const std::string &data) {
     return (data.length() - 1)/ 256 + 1;
 }
 
-int Packager::getChecksum(std::string &data) {
+int Packager::getChecksum(const std::string &data) {
     int sum = 0;
 
     for (char i : data) {
@@ -34,7 +35,7 @@ int Packager::getChecksum(std::string &data) {
     return sum;
 }
 
-Packager::packet Packager::composePacket(std::string &data) {
+packet Packager::composePacket(const std::string &data) {
     packet outbound;
     outbound.checksum = getChecksum(data);
     outbound.data_length = data.length();
@@ -44,12 +45,12 @@ Packager::packet Packager::composePacket(std::string &data) {
     return outbound;
 }
 
-int Packager::send256Bytes(std::string &str) {
+int Packager::send256Bytes(const std::string &str) {
     if (str.length() > 256) {
         return -1;
     }
 
-    outbound = composePacket(data_substr);
+    packet outbound = composePacket(str);
     sendPacket(outbound);
 
     std::cout << "Outbound Data: " << outbound.data << std::endl;
@@ -58,20 +59,20 @@ int Packager::send256Bytes(std::string &str) {
     return 0;
 }
 
-int Packager::sendString(std::string &str) {
+int Packager::sendString(const std::string &str) {
     int num_packets = getNumPackets(str);
 
     packet outbound;
     for (int i = 0; i < num_packets; i++) {
         std::string data_substr = str.substr(i*DATAFIELD_LEN, DATAFIELD_LEN);
-        send256Bytes(data_substr)
+        send256Bytes(data_substr);
     }
     std::cout << "Number of Packets: " << num_packets << std::endl;
 
     return 0;
 }
 
-int Packager::sendFile(std::string &filename) {
+int Packager::sendFile(const std::string &filename) {
     char buffer[DATAFIELD_LEN];
     std::string str;
     unsigned int i = 0;
@@ -107,7 +108,7 @@ int Packager::sendPacket(packet outbound) {
     transmitByte((uint8_t)(outbound.preamble & 0xFF));
     transmitByte((uint8_t)outbound.data_length);
 
-    for(char& c : str) {
+    for(char& c : outbound.data) {
         transmitByte((uint8_t)c);
     }
 
@@ -121,6 +122,20 @@ int Packager::transmitByte(uint8_t data) {
 
 int Packager::transmitByteTest(uint8_t data) {
     std::cout << data << std::endl;
+}
+
+/************** Debug ***************/
+
+void Packager::debug_toggle(int led) {
+	transceiver->ledToggle(led);
+}
+
+void Packager::debug_on(int led) {
+	transceiver->ledOn(led);
+}
+
+void Packager::debug_off(int led) {
+	transceiver->ledOff(led);
 }
 
 

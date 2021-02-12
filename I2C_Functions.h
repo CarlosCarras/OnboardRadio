@@ -34,6 +34,7 @@
 #define BIT_CLEAR(x, bit) ((x) &= ~(1ULL<<(bit)))
 #define BIT_TOGGLE(x, bit) (x ^ (1 << bit));
 
+#define NO_PARAMETER 0x00
 
 /************************** Functions **************************/
 
@@ -49,9 +50,12 @@ public:
 
 	void write(uint8_t reg, uint8_t data);						// writes 1 byte of data into register
 	void write2(uint8_t reg, uint16_t data);					// writes 2 bytes of data into consecutive registers
+	void writen(uint8_t reg, uint8_t* data, int n);				// wrotes n bytes of data into conecutive register
 	uint8_t read(uint8_t reg);									// reads 1 byte of data from register
 	uint16_t read2(uint8_t reg);								// reads 2 bytes of data from consecutive registers
 	uint8_t* readn(uint8_t reg, int n);							// reads n bytes of data from consecutive registers
+	
+	void print_uint8(std::string descriptor, uint8_t data);
 };
 
 #endif // I2C_FUNCTIONS

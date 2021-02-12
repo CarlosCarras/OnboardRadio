@@ -11,7 +11,7 @@
  * Proprty of : ADAMUS Lab
  ****************************************************************************/
 
-#include "UHF_transceiver.h"
+#include "UHF_Transceiver.h"
 
 
 UHF_Transceiver::UHF_Transceiver(uint8_t bus) {
@@ -237,7 +237,7 @@ uint8_t UHF_Transceiver::getRecurringTimeout() {
 
 uint8_t UHF_Transceiver::getDebug() {
 	uint8_t status = i2c.read(DEBUG);
-	status &= 0x7;
+	status &= 0x07;
 
 	std::string out_str = "Debug Status:\n";
 
@@ -275,7 +275,7 @@ void UHF_Transceiver::ledOff(int led) {
 void UHF_Transceiver::ledToggle(int led) {
 	if (led == 1 || led == 0) {
 		uint8_t status = getDebug();
-		BIT_TOGGLE(status, led);
+		status = BIT_TOGGLE(status, led);
 		i2c.write(DEBUG, status);
 		return;
 	}

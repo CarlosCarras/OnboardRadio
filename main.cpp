@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
-#incldue "UHF_Transceiver.h"
-#incldue "Packager.h"
+#include "UHF_Transceiver.h"
+#include "Packager.h"
 #include "Handler.h"
 #include "telecommands.h"
 
 
-#define PROCESS 1
+#define PROCESS 0
 
 
 int main() {
@@ -16,14 +16,14 @@ int main() {
         Handler radio;
         while(1) {
             radio.process(TELECOM_DEBUG_TOGGLE);
-            sleep(2);
+            sleep(1);
         }
     } else if (PROCESS == 1) {
-        UHF_Transceiver transceiver;
+        UHF_Transceiver* transceiver;
+		transceiver = new UHF_Transceiver();
         while(1) {
-            transceiver.ledToggle(0);
-            transceiver.ledToggle(1);
-            sleep(2);
+            transceiver->ledToggle(0);
+			sleep(1);
         }
     }
 

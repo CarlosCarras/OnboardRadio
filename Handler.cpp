@@ -13,7 +13,7 @@
 #include "Handler.h"
 #include "telecommands.h"
 
-Handler::Handler(std::string telecom) {
+Handler::Handler() {
     packager = new Packager();
 }
 
@@ -36,11 +36,12 @@ int Handler::identify_response(std::string telecom) {
     if      (telecom == TELECOM_GET_HEALTH)             sendFile("health.csv");
     else if (telecom == TELECOM_DEBUG_ON) {
         debug_led_on(0);
-        debug_led_on(1);
     }
     else if (telecom == TELECOM_DEBUG_OFF) {
         debug_led_off(0);
-        debug_led_off(1);
+    }
+    else if (telecom == TELECOM_DEBUG_TOGGLE) {
+        debug_led_toggle(0);
     }
     else if (telecom == TELECOM_GET_HEALTH)             sendFile("health.csv");
     else if (telecom == TELECOM_OVERRIDE_ANTENNA)       acknowledge();
@@ -50,14 +51,14 @@ int Handler::identify_response(std::string telecom) {
 }
 
 /******************* Functions *******************/
-void debug_led_on(int led) {
-    packager.transceiver->ledOn(led);
+void Handler::debug_led_on(int led) {
+    packager->debug_on(led);
 }
 
-void debug_led_off(int led) {
-    packager.transceiver->ledOff(led);
+void Handler::debug_led_off(int led) {
+    packager->debug_off(led);
 }
 
-void debug_led_toggle(int led) {
-    packager.transceiver->ledToggle(led);
+void Handler::debug_led_toggle(int led) {
+    packager->debug_toggle(led);
 }
