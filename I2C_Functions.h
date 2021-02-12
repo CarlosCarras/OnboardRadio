@@ -51,6 +51,7 @@ public:
 	void write2(uint8_t reg, uint16_t data);					// writes 2 bytes of data into consecutive registers
 	uint8_t read(uint8_t reg);									// reads 1 byte of data from register
 	uint16_t read2(uint8_t reg);								// reads 2 bytes of data from consecutive registers
+	uint8_t* readn(uint8_t reg, int n);							// reads n bytes of data from consecutive registers
 };
 
 #endif // I2C_FUNCTIONS

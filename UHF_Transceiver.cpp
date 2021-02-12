@@ -77,6 +77,7 @@ uint8_t UHF_Transceiver::getSyncBytes() {
 }
 
 void UHF_Transceiver::transmitByte(uint8_t data) {
+	while(!transmitReady());
 	i2c.write(TX_DATA, data);
 }
 
@@ -409,7 +410,7 @@ uint8_t	UHF_Transceiver::getRxData() {
 
 	if (data == 0xFF) {
 		data = 0x00;		// returns null character
-		//std::cout << "WARNING: No data available in the receive buffer.\n" << std::endl; // pp. 24
+		std::cout << "WARNING: No data available in the receive buffer.\n" << std::endl; // pp. 24
 	}
 
 	return data;
@@ -529,7 +530,7 @@ uint16_t UHF_Transceiver::getPAForwardPower() {
 float UHF_Transceiver::getCoupledPAForwardPower() {
 	uint16_t val = getPAForwardPower();
 	float x = val * 0.00073242187;		// val * (3/4096) [V] (see pp. 28)
-	float y = -68838*pow(x,6) + 228000*pow(x, 5) - 308831*pow(x, 4) + 218934*pow(x, 3) - 85741*pow(x, 2) + 17660*val - 1511.8;	// in dB, pp. 28
+	float y = -68838*pow(x,6) + 228000*pow(x,5) - 308831*pow(x,4) + 218934*pow(x,3) - 85741*pow(x,2) + 17660*val - 1511.8;	// in dB, pp. 28
 	return y;
 }
 
