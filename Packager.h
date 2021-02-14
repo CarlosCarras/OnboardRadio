@@ -1,42 +1,46 @@
-/*
+/****************************************************************************
  * Packager.h
- * @author        : Carlos Carrasquillo
- * @contact       : c.carrasquillo@ufl.edu
- * @date created  : November 11, 2020
- * @date modified : November 11, 2020
- * @description   : controls the transmitting and receiving capabilities of the UHF transceiver over the I2C bus.
- * @hardware      : URTX CPUT Transeiver (Cape Peninsula University of Technology)
+ *
+ * @author      : Carlos Carrasquillo
+ * @contact     : c.carrasquillo@ufl.edu
+ * @created     : November 11, 2020
+ * @modified    : February 12, 2021
+ * @description : controls the transmitting and receiving capabilities of the UHF transceiver over the I2C bus.
+ * @hardware    : URTX CPUT Transeiver (Cape Peninsula University of Technology)
  *
  * Property of ADAMUS lab, University of Florida.
- */
+ ****************************************************************************/
 
 #ifndef ONBOARDRADIO_PACKAGER_H
 #define ONBOARDRADIO_PACKAGER_H
 
+
+/************************** Includes **************************/
+#include <string>
+#include "telecommands.h"
 #include "UHF_Transceiver.h"
 
+
+/************************** Defines ***************************/
 #define TRANSMIT_PREAMBLE      0x1ACF
 #define DATAFIELD_LEN          256      // bytes
 
-struct packet {
-    uint16_t preamble;
-    int data_length;
-    std::string data;
-    int checksum;
-};
 
+/************************** Packager **************************/
 class Packager {
 private:
     UHF_Transceiver* transceiver;
 
     static int getChecksum(const std::string &data);
-    int send256Bytes(const std::string &str);
-    int transmitByte(uint8_t data);
-    int transmitByteTest(uint8_t data);
 	packet composePacket(const std::string &data);
+    int send256Bytes(const std::string &str);
+    void transmitByte(uint8_t data);
+    void transmitByteTest(uint8_t data);
+	void transmitString(std::string data);
+	void transmitStringTest(std::string data);
 
 public:
-    explicit Packager();
+    explicit Packager(UHF_Transceiver* transceiver);
     int getNumPackets(const std::string &data);
     int sendString(const std::string &str);
     int sendFile(const std::string &filename);

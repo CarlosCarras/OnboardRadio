@@ -1,22 +1,23 @@
-/*
+/****************************************************************************
  * Packager.cpp
- * @author        : Carlos Carrasquillo
- * @contact       : c.carrasquillo@ufl.edu
- * @date created  : November 11, 2020
- * @date modified : November 11, 2020
- * @description   : controls the transmitting and receiving capabilities of the UHF transceiver over the I2C bus.
- * @hardware      : URTX CPUT Transeiver (Cape Peninsula University of Technology)
+ *
+ * @author      : Carlos Carrasquillo
+ * @contact     : c.carrasquillo@ufl.edu
+ * @created     : November 11, 2020
+ * @modified    : February 12, 2021
+ * @description : controls the transmitting and receiving capabilities of the UHF transceiver over the I2C bus.
+ * @hardware    : URTX CPUT Transeiver (Cape Peninsula University of Technology)
  *
  * Property of ADAMUS lab, University of Florida.
- */
+ ****************************************************************************/
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include "Packager.h"
 
-Packager::Packager() {
-    transceiver = new UHF_Transceiver();
+Packager::Packager(UHF_Transceiver* transceiver) {
+    this->transceiver = transceiver;
 }
 
 int Packager::getNumPackets(const std::string &data) {
@@ -62,7 +63,6 @@ int Packager::send256Bytes(const std::string &str) {
 int Packager::sendString(const std::string &str) {
     int num_packets = getNumPackets(str);
 
-    packet outbound;
     for (int i = 0; i < num_packets; i++) {
         std::string data_substr = str.substr(i*DATAFIELD_LEN, DATAFIELD_LEN);
         send256Bytes(data_substr);
@@ -89,12 +89,8 @@ int Packager::sendFile(const std::string &filename) {
                 }
         }
 
-        if (i != 0){
-            while (i < DATAFIELD_LEN) {
-                buffer[i++] = '\0';
-            }
-            send256Bytes(std::string(buffer));
-        }
+        std::string last_packet = std::string(buffer);
+        send256Bytes(last_packet.substr(0, i));
 
         outFile.close();
     } else {
@@ -104,23 +100,32 @@ int Packager::sendFile(const std::string &filename) {
 }
 
 int Packager::sendPacket(packet outbound) {
-    transmitByte((uint8_t)(outbound.preamble >> 8));
-    transmitByte((uint8_t)(outbound.preamble & 0xFF));
-    transmitByte((uint8_t)outbound.data_length);
+    std::string data;
 
-    for(char& c : outbound.data) {
-        transmitByte((uint8_t)c);
-    }
+    data.append((char)(outbound.preamble >> 8));
+    data.append((char)(outbound.preamble & 0xFF));
+    data.append((char)outbound.data_length);
+    data.append(outbound.data);
+    data.append((char)outbound.checksum);
 
-    transmitByte((uint8_t)outbound.checksum);
+    transmitString(data);
     return 0;
 }
 
-int Packager::transmitByte(uint8_t data) {
-    transceiver->transmitByte(data);
+void Packager::transmitByte(uint8_t data) {
+    transceiver->sendByte(data);
 }
 
-int Packager::transmitByteTest(uint8_t data) {
+void Packager::transmitString(std::string data) {
+    transceiver->sendString(data);
+}
+
+
+void Packager::transmitByteTest(uint8_t data) {
+    std::cout << data << std::endl;
+}
+
+void Packager::transmitStringTest(std::string data) {
     std::cout << data << std::endl;
 }
 

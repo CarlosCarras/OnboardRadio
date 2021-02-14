@@ -1,22 +1,19 @@
  /****************************************************************************
  * UHF_transceiver.cpp
  * 
- * Hardware   : UHF Transceiver
- * Manual     : USM-01-00097 User Manual Rev. C
- * About      : The class definition to interface with the UHF transceiver.
- * 
- * Author     : Carlos Carrasquillo
- * Date       : August 20, 2020
- * Modified   : August 22, 2020
- * Proprty of : ADAMUS Lab
+ * @hardware    : UHF Transceiver
+ * @manual      : USM-01-00097 User Manual Rev. C
+ * @about       : The class definition to interface with the UHF transceiver.
+ * @author      : Carlos Carrasquillo
+ * @contact    : c.carrasquillo@ufl.edu
+ * @date        : August 20, 2020
+ * @modified    : February 12, 2021
+ *
+ * Property of ADAMUS lab, University of Florida.
  ****************************************************************************/
 
 #include "UHF_Transceiver.h"
 
-
-UHF_Transceiver::UHF_Transceiver(uint8_t bus) {
-	i2c = I2C_Functions(bus, TRANSCEIVER_I2C_ADDR);
-}
 
 uint8_t UHF_Transceiver::getModemConfig() {
 	uint8_t config = i2c.read(MODEM_CONFIG);
@@ -76,9 +73,21 @@ uint8_t UHF_Transceiver::getSyncBytes() {
 	return i2c.read(SYNC_BYTES);
 }
 
-void UHF_Transceiver::transmitByte(uint8_t data) {
+void UHF_Transceiver::sendByte(uint8_t data) {
 	while(!transmitReady());
 	i2c.write(TX_DATA, data);
+}
+
+void UHF_Transceiver::sendNBytes(uint8_t* data, int n) {
+	while(!transmitReady());
+	i2c.writen(TX_DATA, data, n);
+}
+
+void UHF_Transceiver::sendString(const std::string &data) {
+	int n = data.length();
+	char* data_arr = &data[0];		// string to char array
+	uint8_t* data_out = (uint8_t*)data_arr;
+	sendNBytes(data_out, n);
 }
 
 uint8_t UHF_Transceiver::getBeaconCtrl() {
@@ -182,7 +191,7 @@ void UHF_Transceiver::setRxFreq(uint16_t freq) {
 	if (freq > 440 || freq < 430) {
 		std::cout <<  "ERROR: The desired receiving frequency is outside of the bounds of 430 MHHz and 440 MHz." << std::endl;
 	}
-	uint16_t offset = (freq - 430) * 80;		// pp. 22
+	uint16_t offset = (freq - 430) * 80;												// pp. 22
 	setRxFreqOffset(offset);
 }
 
@@ -405,7 +414,8 @@ uint16_t UHF_Transceiver::getRxBufferCount() {
 	return cnt;
 }
 
-uint8_t	UHF_Transceiver::getRxData() {
+uint8_t	UHF_Transceiver::readByte() {
+	while(!receiveReady());
 	uint8_t data = i2c.read(RX_DATA);
 
 	if (data == 0xFF) {
@@ -413,6 +423,29 @@ uint8_t	UHF_Transceiver::getRxData() {
 		std::cout << "WARNING: No data available in the receive buffer.\n" << std::endl; // pp. 24
 	}
 
+	return data;
+}
+
+uint8_t* UHF_Transceiver::readNBytes(int n) {
+	while(!receiveReady());
+	uint8_t* data = i2c.readn(RX_DATA, n);
+	return data;
+}
+
+std::string UHF_Transceiver::readString(int n) {
+	uint8_t* incoming_raw = readNBytes(n);
+	std::string data = (char*)incoming_raw;
+	return data;
+}
+
+/* NOT MEANT FOR USE */
+std::string UHF_Transceiver::readUntilDelimiter(char delimiter) {
+	std::string data;
+	char incoming = (char)readByte();
+	while (incoming != delimiter) {
+		data.append(incoming);
+		incoming = (char)readByte();
+	}
 	return data;
 }
 
@@ -482,7 +515,7 @@ uint8_t UHF_Transceiver::getDTMFToneCnt() {
 
 float UHF_Transceiver::getRSSI() {
 	uint16_t val = i2c.read2(RSSI);
-	float rssi = val * 0.00073242187;	// val * (3/4096) [V]	(see pp. 26)
+	float rssi = val * 0.00073242187;								// val * (3/4096) [V]	(see pp. 26)
 	return rssi;
 }
 
@@ -498,27 +531,27 @@ int UHF_Transceiver::getPATemp() {
 
 float UHF_Transceiver::getCurrent3V3() {
 	uint16_t val = i2c.read2(CURRENT_3V3);
-	float current = val * 0.000003;		// val * (3e-6) [A]   (see pp. 27) 
+	float current = val * 0.000003;				`					// val * (3e-6) [A]   (see pp. 27)
 	return current;
 }
 
 float UHF_Transceiver::getVoltage3V3() {
 	uint16_t val = i2c.read2(VOLTAGE_3V3);
 	val &= 0x1FFF;
-	float voltage = val * 0.004;		// val * (4e-3) [V]   (see pp. 27) 
+	float voltage = val * 0.004;									// val * (4e-3) [V]   (see pp. 27)
 	return voltage;
 }
 
 float UHF_Transceiver::getCurrent5V() {
 	uint16_t val = i2c.read2(CURRENT_5V);
-	float current = val * 0.000062;		// val * (62e-6) [A]   (see pp. 27) 
+	float current = val * 0.000062;									// val * (62e-6) [A]   (see pp. 27)
 	return current;
 }
 
 float UHF_Transceiver::getVoltage5V() {
 	uint16_t val = i2c.read2(VOLTAGE_5V);
 	val &= 0x1FFF;
-	float voltage = val * 0.004;		// val * (4e-3) [V]   (see pp. 27) 
+	float voltage = val * 0.004;									// val * (4e-3) [V]   (see pp. 27)
 	return voltage;
 }
 
@@ -529,13 +562,13 @@ uint16_t UHF_Transceiver::getPAForwardPower() {
 
 float UHF_Transceiver::getCoupledPAForwardPower() {
 	uint16_t val = getPAForwardPower();
-	float x = val * 0.00073242187;		// val * (3/4096) [V] (see pp. 28)
+	float x = val * 0.00073242187;									// val * (3/4096) [V] (see pp. 28)
 	float y = -68838*pow(x,6) + 228000*pow(x,5) - 308831*pow(x,4) + 218934*pow(x,3) - 85741*pow(x,2) + 17660*val - 1511.8;	// in dB, pp. 28
 	return y;
 }
 
 float UHF_Transceiver::getActualPAForwardPower() {
-	return getCoupledPAForwardPower() + 32.5;		// in dB  (see pp. 28)
+	return getCoupledPAForwardPower() + 32.5;						// in dB  (see pp. 28)
 }
 
 uint16_t UHF_Transceiver::getPAReversePower() {
@@ -545,13 +578,13 @@ uint16_t UHF_Transceiver::getPAReversePower() {
 
 float UHF_Transceiver::getCoupledPAReversePower() {
 	uint16_t val = getPAReversePower();
-	float x = val * 0.00073242187;		// val * (3/4096) [V] (see pp. 28)
+	float x = val * 0.00073242187;									// val * (3/4096) [V] (see pp. 28)
 	float y = -68838*pow(x,6) + 228000*pow(x,5) - 308831*pow(x,4) + 218934*pow(x,3) - 85741*pow(x,2) + 17660*val - 1511.8;	// in dB, pp. 28
 	return y;
 }
 
 float UHF_Transceiver::getActualPAReversePower() {
-	return getCoupledPAReversePower() + 32.5;		// in dB  (see pp. 28)
+	return getCoupledPAReversePower() + 32.5;						// in dB  (see pp. 28)
 }
 
 float UHF_Transceiver::getPAReverseLoss() {

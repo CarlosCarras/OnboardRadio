@@ -1,15 +1,16 @@
- /****************************************************************************
- * UHF_transceiver.h
- * 
- * Hardware   : UHF Transceiver
- * Manual     : USM-01-00097 User Manual Rev. C
- * About      : The class definition to interface with the UHF transceiver.
- * 
- * Author     : Carlos Carrasquillo
- * Date       : August 22, 2020
- * Modified   : August 22, 2020
- * Proprty of : ADAMUS Lab
- ****************************************************************************/
+/****************************************************************************
+* UHF_transceiver.h
+*
+* @hardware    : UHF Transceiver
+* @manual      : USM-01-00097 User Manual Rev. C
+* @about       : The class definition to interface with the UHF transceiver.
+* @author      : Carlos Carrasquillo
+* @contact    : c.carrasquillo@ufl.edu
+* @date        : August 20, 2020
+* @modified    : February 12, 2021
+*
+* Property of ADAMUS lab, University of Florida.
+****************************************************************************/
 
 #ifndef UHF_TRASCEIVER
 #define UHF_TRASCEIVER
@@ -84,12 +85,14 @@ private:
 public: 
     explicit UHF_Transceiver(uint8_t bus = 2);
 	uint8_t getModemConfig();								// reports modulation scheme
-	void setModemConfig(uint8_t config);				// sets modulation scheme
+	void setModemConfig(uint8_t config);					// sets modulation scheme
 	void setTransmissionDelay(uint8_t delay);				// sets AX.25 transmission delay (1-255)
 	uint8_t getTransmissionDelay();							// gets AX.25 transmission delay (1-255)
 	void setSyncBytes(uint8_t val);							// configure the sync byte value
 	uint8_t getSyncBytes();									// read the sync byte value
-	void transmitByte(uint8_t data);						// transmits a byte of data
+	void sendByte(uint8_t data);							// transmits a byte of data
+	void sendNBytes(uint8_t* data, int n);					// transmits 'n' bytes of data
+	void sendString(const std::string &data);				// transmits a string of data
 	uint8_t getBeaconCtrl();								// reads the beacon control register
 	void clearBeaconData();									// clears the beacon data
 	void enableBeacon();									// enables the beacon functionality
@@ -118,7 +121,10 @@ public:
 	bool transmitReady();									// determines whether data can be transmitted
 	bool receiveReady();									// determines whether data can be received
 	uint16_t getRxBufferCount();							// determines number of bytes to be read from the receive buffer
-	uint8_t getRxData();									// fetches the data from the received data buffer
+	uint8_t readByte();										// fetches the data from the received data buffer
+	uint8_t* readNBytes(int n);								// fetches 'n' bytes from the received data buffer
+	std::string readString(int n);							// fetches 'n' bytes from the received data buffer, returns string
+	std::string readUntilDelimiter(char delimiter);			// NOT MEANT FOR USE: reads data until a selected delimiter (e.g. EOF) is read
 	uint16_t getTxFreeSlots();								// determines number of free slots in the transmit buffer
 	uint16_t getRxCRCFailCnt();								// determines total number of AX.25 packets dropped due to AX.25 frame check sequence (FCS) failing
 	uint16_t getRxPacketCnt();								// determines total number of times an AX.25 packet is successfully received

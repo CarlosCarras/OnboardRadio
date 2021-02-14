@@ -1,14 +1,14 @@
- /****************************************************************************
- * i2c_functions.h
- * 
- * Dependencies : lsquaredc.c\h
- * About      	: Basic i2c read/write functions for 1 and 2 bytes.
- * 
- * Author     	: Carlos Carrasquillo
- * Date       	: August 20, 2020
- * Modified   	: August 22, 2020
- * Proprty of 	: ADAMUS Lab
- ****************************************************************************/
+/****************************************************************************
+* I2C_Functions.h
+*
+* @about      : A class to simplify the use of the I2C bus on Linux.
+* @author     : Carlos Carrasquillo
+* @contact    : c.carrasquillo@ufl.edu
+* @date       : July 16, 2020
+* @modified   : February 12, 2021
+*
+* Property of ADAMUS lab, University of Florida.
+****************************************************************************/
 
 #ifndef I2C_FUNCTIONS
 #define I2C_FUNCTIONS
@@ -34,7 +34,6 @@
 #define BIT_CLEAR(x, bit) ((x) &= ~(1ULL<<(bit)))
 #define BIT_TOGGLE(x, bit) (x ^ (1 << bit));
 
-#define NO_PARAMETER 0x00
 
 /************************** Functions **************************/
 

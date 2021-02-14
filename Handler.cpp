@@ -1,24 +1,24 @@
-/*
- * Handler.cpp
- * @author        : Carlos Carrasquillo
- * @contact       : c.carrasquillo@ufl.edu
- * @date created  : February 4, 2021
- * @date modified : February 4, 2021
- * @description   : retreives the relevant output data or the acknowledge signal in response to a telecommand
- * @hardware      : N/A
- *
- * Property of ADAMUS lab, University of Florida.
- */
+/****************************************************************************
+* Handler.cpp
+*
+* @about      : retreives the relevant output data or the acknowledge signal in response to a telecommand
+* @author     : Carlos Carrasquillo
+* @contact    : c.carrasquillo@ufl.edu
+* @date       : February 4, 2021
+* @modified   : February 12, 2021
+*
+* Property of ADAMUS lab, University of Florida.
+****************************************************************************/
 
 #include "Handler.h"
-#include "telecommands.h"
 
-Handler::Handler() {
-    packager = new Packager();
+
+Handler::Handler(UHF_Transceiver* transceiver) {
+    packager = new Packager(transceiver);
 }
 
-void Handler::process(std::string telecom) {
-    int status = identify_response(telecom);
+void Handler::process(command incoming_command) {
+    int status = identify_response(incoming_command);
     if (status != 0) {
         std::cout << "ERROR: Unknown Telecommand." << std::endl;
     }
@@ -32,7 +32,9 @@ void Handler::acknowledge(void) {
     packager->sendString(ACKNOWLEDGE);
 }
 
-int Handler::identify_response(std::string telecom) {
+int Handler::identify_response(command incoming_command) {
+    std::string telecom == incoming_command.telecommand;
+
     if      (telecom == TELECOM_GET_HEALTH)             sendFile("health.csv");
     else if (telecom == TELECOM_DEBUG_ON) {
         debug_led_on(0);
