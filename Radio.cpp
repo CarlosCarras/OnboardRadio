@@ -13,6 +13,7 @@
 #include "UHF_Transceiver.h"
 #include "Handler.h"
 #incldue "Interpreter.h"
+#include "telecommands.h"
 #include "Radio.h"
 
 
@@ -23,7 +24,7 @@ Radio::Radio() {
 }
 
 int Radio::scan() {
-    command incoming_command = interpreter->scan();
+    command incoming_command = interpreter->getCommand();
     int status = handler->process(incoming_command);
     return status;
 }

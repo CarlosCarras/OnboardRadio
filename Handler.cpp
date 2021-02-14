@@ -21,6 +21,7 @@ void Handler::process(command incoming_command) {
     int status = identify_response(incoming_command);
     if (status != 0) {
         std::cout << "ERROR: Unknown Telecommand." << std::endl;
+        sendError();
     }
 }
 
@@ -30,6 +31,10 @@ void Handler::sendFile(std::string filename) {
 
 void Handler::acknowledge(void) {
     packager->sendString(ACKNOWLEDGE);
+}
+
+void Handler::sendError(void) {
+    packager->sendString(ERROR);
 }
 
 int Handler::identify_response(command incoming_command) {

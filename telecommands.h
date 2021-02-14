@@ -15,6 +15,7 @@
 #define TELECOMMANDS_H
 
 #define ACKNOWLEDGE              "11001100"
+#define ERROR                    "00110010"
 #define EOT		     		              4     // end of transmission in ASCII
 
 #define TELECOM_GET_HEALTH       "01001101"
