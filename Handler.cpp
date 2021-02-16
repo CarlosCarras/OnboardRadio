@@ -17,12 +17,13 @@ Handler::Handler(UHF_Transceiver* transceiver) {
     packager = new Packager(transceiver);
 }
 
-void Handler::process(command incoming_command) {
+int Handler::process(command_t* incoming_command) {
     int status = identify_response(incoming_command);
     if (status != 0) {
         std::cout << "ERROR: Unknown Telecommand." << std::endl;
         sendError();
     }
+    return status;
 }
 
 void Handler::sendFile(std::string filename) {
@@ -37,8 +38,8 @@ void Handler::sendError(void) {
     packager->sendString(ERROR);
 }
 
-int Handler::identify_response(command incoming_command) {
-    std::string telecom == incoming_command.telecommand;
+int Handler::identify_response(command_t* incoming_command) {
+    std::string telecom = incoming_command->telecommand;
 
     if      (telecom == TELECOM_GET_HEALTH)             sendFile("health.csv");
     else if (telecom == TELECOM_DEBUG_ON) {

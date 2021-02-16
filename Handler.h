@@ -24,14 +24,14 @@
 class Handler {
 private:
     Packager* packager;
-    int identify_response(command incoming_command);
+    int identify_response(command_t* incoming_command);
     void sendFile(std::string filename);
     void acknowledge(void);
     void sendError(void);
 
 public:
     explicit Handler(UHF_Transceiver* transceiver);
-    void process(command incoming_command);
+    int process(command_t* incoming_command);
 
     /******************* Functions *******************/
     void debug_led_on(int led);

@@ -1,11 +1,11 @@
  /****************************************************************************
- * UHF_transceiver.cpp
+ * UHF_Transceiver.cpp
  * 
  * @hardware    : UHF Transceiver
  * @manual      : USM-01-00097 User Manual Rev. C
  * @about       : The class definition to interface with the UHF transceiver.
  * @author      : Carlos Carrasquillo
- * @contact    : c.carrasquillo@ufl.edu
+ * @contact     : c.carrasquillo@ufl.edu
  * @date        : August 20, 2020
  * @modified    : February 12, 2021
  *
@@ -14,6 +14,10 @@
 
 #include "UHF_Transceiver.h"
 
+
+UHF_Transceiver::UHF_Transceiver(uint8_t bus) {
+	i2c = I2C_Functions(bus, TRANSCEIVER_I2C_ADDR);
+}
 
 uint8_t UHF_Transceiver::getModemConfig() {
 	uint8_t config = i2c.read(MODEM_CONFIG);
@@ -85,9 +89,12 @@ void UHF_Transceiver::sendNBytes(uint8_t* data, int n) {
 
 void UHF_Transceiver::sendString(const std::string &data) {
 	int n = data.length();
-	char* data_arr = &data[0];		// string to char array
+	char* data_arr = new char[n+1];
+	strcpy(data_arr, data.c_str());
 	uint8_t* data_out = (uint8_t*)data_arr;
 	sendNBytes(data_out, n);
+
+	delete[] data_arr;
 }
 
 uint8_t UHF_Transceiver::getBeaconCtrl() {
@@ -443,7 +450,7 @@ std::string UHF_Transceiver::readUntilDelimiter(char delimiter) {
 	std::string data;
 	char incoming = (char)readByte();
 	while (incoming != delimiter) {
-		data.append(incoming);
+		data += incoming;
 		incoming = (char)readByte();
 	}
 	return data;
@@ -531,7 +538,7 @@ int UHF_Transceiver::getPATemp() {
 
 float UHF_Transceiver::getCurrent3V3() {
 	uint16_t val = i2c.read2(CURRENT_3V3);
-	float current = val * 0.000003;				`					// val * (3e-6) [A]   (see pp. 27)
+	float current = val * 0.000003;									// val * (3e-6) [A]   (see pp. 27)
 	return current;
 }
 

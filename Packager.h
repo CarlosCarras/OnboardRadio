@@ -31,8 +31,8 @@ class Packager {
 private:
     UHF_Transceiver* transceiver;
 
-    static int getChecksum(const std::string &data);
-	packet composePacket(const std::string &data);
+    static uint8_t getChecksum(const std::string &data);
+	packet_t composePacket(const std::string &data);
     int send256Bytes(const std::string &str);
     void transmitByte(uint8_t data);
     void transmitByteTest(uint8_t data);
@@ -44,7 +44,7 @@ public:
     int getNumPackets(const std::string &data);
     int sendString(const std::string &str);
     int sendFile(const std::string &filename);
-    int sendPacket(packet outbound);
+    int sendPacket(packet_t outbound);
 	
 	void debug_toggle(int led);
 	void debug_on(int led);

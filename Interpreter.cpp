@@ -17,36 +17,38 @@ Interpreter::Interpreter(UHF_Transceiver* transceiver) {
     this->transceiver = transceiver;
 }
 
-command Interpreter::getCommand() {
+command_t Interpreter::getCommand() {
     int n = transceiver->getRxBufferCount();
+    packet_t inbound_packet;
+    command_t inbound_command;
 
     if (n != 0) {
         uint8_t* data = transceiver->readNBytes(n);
-        packet inbound = composePacket(data, n);
-        command incoming_command = interpret_packet(inbound);
+        inbound_packet = composePacket(data, n);
+        inbound_command = composeCommand(inbound_packet);
     } else {
-        return command('\0', '\0');
+        return {'\0', '\0'};
     }
 
-    return incoming_command;
+    return inbound_command;
 }
 
-packet Interpreter::composePacket(uint8_t* data_arr, int n) {
+packet_t Interpreter::composePacket(uint8_t* data_arr, int n) {
     std::string data = (char*)data_arr;
 
-    packet inbound;
-    inbound.preamble = data.substr(0,2);
-    inbound.data_length = n-4;
-    inbound.data = data.substr(2,inbound.data_length);
-    inbound.checksum = getChecksum(inbound.data_length+3,1);
+    packet_t inbound_packet;
+    inbound_packet.preamble = (data_arr[0] << 8) && (data_arr[1] && 0xFF);
+    inbound_packet.data_length = n-4;
+    inbound_packet.data = data.substr(2,inbound_packet.data_length);
+    inbound_packet.checksum = data_arr[n-1];
 
-    return inbound;
+    return inbound_packet;
 }
 
-command Interpreter::composeCommand(packet inbound) {
-    command incoming_command;
-    incoming_command.telecommand = inbound.data(0,1);
-    incoming_command.param = inbound.data(1);
+command_t Interpreter::composeCommand(packet_t inbound_packet) {
+    command_t inbound_command;
+    inbound_command.telecommand = inbound_packet.data.substr(0,1);
+    inbound_command.params = inbound_packet.data.substr(1);
 
-    return incoming_command;
+    return inbound_command;
 }

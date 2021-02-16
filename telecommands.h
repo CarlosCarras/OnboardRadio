@@ -14,6 +14,9 @@
 #ifndef TELECOMMANDS_H
 #define TELECOMMANDS_H
 
+#include <stdint.h>
+#include <string>
+
 #define ACKNOWLEDGE              "11001100"
 #define ERROR                    "00110010"
 #define EOT		     		              4     // end of transmission in ASCII
@@ -24,14 +27,14 @@
 #define TELECOM_DEBUG_OFF        "00001111"
 #define TELECOM_DEBUG_TOGGLE     "10101010"
 
-struct packet {
+struct packet_t {
     uint16_t preamble;
-    int data_length;
+    uint8_t data_length;
     std::string data;
-    int checksum;
+    uint8_t checksum;
 };
 
-struct command {
+struct command_t {
     std::string telecommand;
     std::string params;
 };

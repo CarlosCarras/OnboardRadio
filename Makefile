@@ -4,19 +4,20 @@ all:
 	g++ -c -std=c++0x -o UHF_Transceiver.o UHF_Transceiver.cpp
 	g++ -c -std=c++0x -o Packager.o Packager.cpp
 	g++ -c -std=c++0x -o Handler.o Handler.cpp
+	g++ -c -std=c++0x -o Interpreter.o Interpreter.cpp
+	g++ -c -std=c++0x -o Radio.o Radio.cpp
 	g++ -c -std=c++0x -o main.o main.cpp
-	g++ -o testapp lsquaredc.o I2C_Functions.o UHF_Transceiver.o Packager.o Handler.o main.o
+	g++ -o testapp lsquaredc.o I2C_Functions.o UHF_Transceiver.o Packager.o Handler.o Interpreter.o Radio.o main.o
 	
-handler: 
-	g++ -c -std=c++0x -o Handler.o Handler.cpp
+main: 
 	g++ -c -std=c++0x -o main.o main.cpp
-	g++ -o testapp lsquaredc.o I2C_Functions.o UHF_Transceiver.o Packager.o Handler.o main.o
+	g++ -o testapp lsquaredc.o I2C_Functions.o UHF_Transceiver.o Packager.o Handler.o Interpreter.o Radio.o main.o
+
+radio:
+	g++ -c -std=c++0x -o Radio.o Radio.cpp
+	g++ -c -std=c++0x -o main.o main.cpp
+	g++ -o testapp lsquaredc.o I2C_Functions.o UHF_Transceiver.o Packager.o Handler.o Interpreter.o Radio.o main.o
 
 clean:
-	rm lsquaredc.o
-	rm I2C_Functions.o
-	rm UHF_Transceiver.o
-	rm Packager.o
-	rm Handler.o
-	rm main.o
-	rm testapp
+	rm *.o
+	rm -f testapp

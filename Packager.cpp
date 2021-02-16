@@ -24,22 +24,20 @@ int Packager::getNumPackets(const std::string &data) {
     return (data.length() - 1)/ 256 + 1;
 }
 
-int Packager::getChecksum(const std::string &data) {
-    int sum = 0;
+uint8_t Packager::getChecksum(const std::string &data) {
+    uint8_t sum = 0;
 
     for (char i : data) {
-        sum += (int)i;
+        sum += (uint8_t)i;
     }
 
-    std::stringstream ss;
-    std::string out_str = ss.str();
     return sum;
 }
 
-packet Packager::composePacket(const std::string &data) {
-    packet outbound;
+packet_t Packager::composePacket(const std::string &data) {
+    packet_t outbound;
     outbound.checksum = getChecksum(data);
-    outbound.data_length = data.length();
+    outbound.data_length = (uint8_t)data.length();
     outbound.data = data;
     outbound.preamble = TRANSMIT_PREAMBLE;
 
@@ -51,7 +49,7 @@ int Packager::send256Bytes(const std::string &str) {
         return -1;
     }
 
-    packet outbound = composePacket(str);
+    packet_t outbound = composePacket(str);
     sendPacket(outbound);
 
     std::cout << "Outbound Data: " << outbound.data << std::endl;
@@ -99,14 +97,14 @@ int Packager::sendFile(const std::string &filename) {
     return 0;
 }
 
-int Packager::sendPacket(packet outbound) {
+int Packager::sendPacket(packet_t outbound) {
     std::string data;
 
-    data.append((char)(outbound.preamble >> 8));
-    data.append((char)(outbound.preamble & 0xFF));
-    data.append((char)outbound.data_length);
-    data.append(outbound.data);
-    data.append((char)outbound.checksum);
+    data += (char)(outbound.preamble >> 8);
+    data += (char)(outbound.preamble & 0xFF);
+    data += (char)outbound.data_length;
+    data += outbound.data;
+    data += (char)outbound.checksum;
 
     transmitString(data);
     return 0;

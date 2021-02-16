@@ -1,23 +1,24 @@
 /****************************************************************************
-* UHF_transceiver.h
+* UHF_Transceiver.hs
 *
 * @hardware    : UHF Transceiver
 * @manual      : USM-01-00097 User Manual Rev. C
 * @about       : The class definition to interface with the UHF transceiver.
 * @author      : Carlos Carrasquillo
-* @contact    : c.carrasquillo@ufl.edu
+* @contact     : c.carrasquillo@ufl.edu
 * @date        : August 20, 2020
 * @modified    : February 12, 2021
 *
 * Property of ADAMUS lab, University of Florida.
 ****************************************************************************/
 
-#ifndef UHF_TRASCEIVER
-#define UHF_TRASCEIVER
+#ifndef UHF_TRANSCEIVER
+#define UHF_TRANSCEIVER
 
 
 /************************** Includes **************************/
 #include <string>
+#include <string.h>
 #include <math.h>
 #include "I2C_Functions.h"
 
@@ -157,4 +158,4 @@ public:
 /**** Test Functions ****/
 void transmitByteTest(uint8_t data);
 
-#endif // UHF_TRASCEIVER
+#endif // UHF_TRANSCEIVER

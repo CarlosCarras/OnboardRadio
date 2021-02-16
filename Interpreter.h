@@ -15,6 +15,9 @@
 
 /************************** Includes **************************/
 #include <string>
+#include <stdlib.h>
+#include <iostream>
+#include "UHF_Transceiver.h"
 #include "telecommands.h"
 
 
@@ -22,12 +25,12 @@
 class Interpreter {
 private:
     UHF_Transceiver* transceiver;
-    packet composePacket(uint8_t* data, int n);
-    command composeCommand(packet inbound);
+    packet_t composePacket(uint8_t* data, int n);
+    command_t composeCommand(packet_t inbound_packet);
 
 public:
     explicit Interpreter(UHF_Transceiver* transceiver);
-    std::string getCommand();
+    command_t getCommand();
 };
 
 #endif //INTERPRETER_H
