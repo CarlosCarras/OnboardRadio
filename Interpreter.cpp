@@ -5,7 +5,7 @@
 * @author     : Carlos Carrasquillo
 * @contact    : c.carrasquillo@ufl.edu
 * @date       : February 14, 2021
-* @modified   : February 14, 2021
+* @modified   : February 18, 2021
 *
 * Property of ADAMUS lab, University of Florida.
 ****************************************************************************/
@@ -27,7 +27,7 @@ command_t Interpreter::getCommand() {
         inbound_packet = composePacket(data, n);
         inbound_command = composeCommand(inbound_packet);
     } else {
-        return {'\0', '\0'};
+        return {"\0", "\0"};
     }
 
     return inbound_command;
@@ -37,10 +37,10 @@ packet_t Interpreter::composePacket(uint8_t* data_arr, int n) {
     std::string data = (char*)data_arr;
 
     packet_t inbound_packet;
-    inbound_packet.preamble = (data_arr[0] << 8) && (data_arr[1] && 0xFF);
-    inbound_packet.data_length = n-4;
-    inbound_packet.data = data.substr(2,inbound_packet.data_length);
-    inbound_packet.checksum = data_arr[n-1];
+    inbound_packet.preamble = (data_arr[0] << 8) | (data_arr[1] & 0xFF);
+    inbound_packet.data_length = n-5;
+    inbound_packet.data = data.substr(3,inbound_packet.data_length);
+    inbound_packet.checksum = data_arr[n-1];    // MUST TEST
 
     return inbound_packet;
 }
