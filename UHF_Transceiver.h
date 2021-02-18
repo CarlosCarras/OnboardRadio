@@ -153,6 +153,7 @@ public:
 	void ledOn(int led);
 	void ledOff(int led);
 	void ledToggle(int led);
+	void sendStringTest(const std::string &data);
 };
 
 /**** Test Functions ****/

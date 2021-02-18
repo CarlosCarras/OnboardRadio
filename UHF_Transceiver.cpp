@@ -597,3 +597,16 @@ float UHF_Transceiver::getActualPAReversePower() {
 float UHF_Transceiver::getPAReverseLoss() {
 	return getActualPAReversePower() - getActualPAForwardPower();	// in dB  (see pp. 28)
 }
+
+/************************** Testing **************************/
+
+ void UHF_Transceiver::sendStringTest(const std::string &data) {
+	 int n = data.length();
+	 char* data_arr = new char[n+1];
+	 strcpy(data_arr, data.c_str());
+	 uint8_t* data_out = (uint8_t*)data_arr;
+
+	 for (int i = 0; i < n; i++) {
+		 std::cout << (char)data_out[i] << std::endl;
+	 }
+ }

@@ -35,8 +35,8 @@ private:
 	packet_t composePacket(const std::string &data);
     int send256Bytes(const std::string &str);
     void transmitByte(uint8_t data);
-    void transmitByteTest(uint8_t data);
 	void transmitString(std::string data);
+
 	void transmitStringTest(std::string data);
 
 public:

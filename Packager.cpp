@@ -106,7 +106,7 @@ int Packager::sendPacket(packet_t outbound) {
     data += outbound.data;
     data += (char)outbound.checksum;
 
-    transmitString(data);
+    transmitStringTest(data);       // REMOVE 'Test' AFTER TESTING
     return 0;
 }
 
@@ -116,15 +116,6 @@ void Packager::transmitByte(uint8_t data) {
 
 void Packager::transmitString(std::string data) {
     transceiver->sendString(data);
-}
-
-
-void Packager::transmitByteTest(uint8_t data) {
-    std::cout << data << std::endl;
-}
-
-void Packager::transmitStringTest(std::string data) {
-    std::cout << data << std::endl;
 }
 
 /************** Debug ***************/
@@ -141,4 +132,6 @@ void Packager::debug_off(int led) {
 	transceiver->ledOff(led);
 }
 
-
+void Packager::transmitStringTest(std::string data) {
+    transceiver->sendStringTest(data);
+}
