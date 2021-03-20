@@ -7,7 +7,7 @@
  * @author      : Carlos Carrasquillo
  * @contact     : c.carrasquillo@ufl.edu
  * @date        : August 20, 2020
- * @modified    : February 12, 2021
+ * @modified    : March 19, 2021
  *
  * Property of ADAMUS lab, University of Florida.
  ****************************************************************************/
@@ -25,10 +25,10 @@ uint8_t UHF_Transceiver::getModemConfig() {
 
 	std::string out_str = "Modulation Scheme: ";
 
-	if      (config == 0b01) out_str += "9600 bps GMSK downlink, 1200 bps AFSK uplink.\n";
-	else if (config == 0b10) out_str += "1200 bps AFSK downlink, 9600 bps GMSK uplink.\n";
-	else if (config == 0b11) out_str += "9600 bps GMSK downlink and uplink.\n";
-	else					 out_str += "ERROR: There was an error in the reception of the data.\n";
+	if      (config == MODEM_GMSK_DOWN) out_str += "9600 bps GMSK downlink, 1200 bps AFSK uplink.\n";
+	else if (config == MODEM_GMSK_UP)   out_str += "1200 bps AFSK downlink, 9600 bps GMSK uplink.\n";
+	else if (config == MODEM_GMSK_BOTH) out_str += "9600 bps GMSK downlink and uplink.\n";
+	else					            out_str += "ERROR: There was an error in the reception of the data.\n";
 
 	std::cout << out_str << std::endl;
 	return config;
@@ -40,15 +40,15 @@ void UHF_Transceiver::setModemConfig(uint8_t config) {
 	std::string out_str = "Modulation scheme switched to: ";
 
 	switch (config) {
-		case 0:  
+		case MODEM_GMSK_DOWN:  
 			out_str += "9600 bps GMSK downlink, 1200 bps AFSK uplink.\n";
 			command = config;
 			break;
-		case 1: 
+		case MODEM_GMSK_UP: 
 			out_str += "1200 bps AFSK downlink, 9600 bps GMSK uplink.\n";
 			command = config; 
 			break;
-		case 2: 
+		case MODEM_GMSK_BOTH: 
 			out_str += "600 bps GMSK downlink and uplink.\n";
 			command = config; 
 			break;
@@ -142,9 +142,9 @@ uint8_t UHF_Transceiver::getPAPower() {
 
 	std::string out_str = "Power Amplifier Power Level: ";
 
-	if      (power == 0b00) out_str+= "27 dBm (0.5 W).\n";
-	else if (power == 0b01) out_str += "30 dBm (1 W).\n";
-	else if (power == 0b10) out_str += "33 dBm (2 W).\n";
+	if      (power == PA_LVL_27) out_str+= "27 dBm (0.5 W).\n";
+	else if (power == PA_LVL_30) out_str += "30 dBm (1 W).\n";
+	else if (power == PA_LVL_33) out_str += "33 dBm (2 W).\n";
 	else 	  			 	out_str += "Inhibit (0 dBm/W).\n";
 
 	std::cout << out_str << std::endl;
@@ -157,21 +157,21 @@ void UHF_Transceiver::setPAPower(uint8_t config) {
 	std::string out_str = "Power Amplifier power level switched to: ";
 
 	switch (config) {
-		case 0: 
+		case PA_LVL_27: 
 			out_str += "27 dBm (0.5 W).\n";
-			command = config; 
+			command = PA_LVL_27; 
 			break;
-		case 1: 
+		case PA_LVL_30: 
 			out_str += "30 dBm (1 W).\n";
-			command = config; 
+			command = PA_LVL_30; 
 			break;
-		case 2: 
+		case PA_LVL_33: 
 			out_str += "33 dBm (2 W).\n";
-			command = config; 
+			command = PA_LVL_33; 
 			break;
-		case 3:
+		case PA_LVL_INHIBIT:
 			out_str += "Inhibit (0 dBm/W).\n";
-			command = config; 
+			command = PA_LVL_INHIBIT; 
 		default: 
 			std::cout << "ERROR: Modulation scheme was not appropriate.\n" << std::endl;
 			return;
@@ -188,23 +188,23 @@ uint16_t UHF_Transceiver::getRxFreqOffset() {
 }
 
 void UHF_Transceiver::setRxFreqOffset(uint16_t offset) {
-	if (offset > 511) {
+	if (offset > 1023) {
 		std::cout << "ERROR: Rx frequency offset is larger than 511." << std::endl;
 	}
 	i2c.write2(RX_OFFSET, offset);
 }
 
-void UHF_Transceiver::setRxFreq(uint16_t freq) {
+void UHF_Transceiver::setRxFreq(float freq) {
 	if (freq > 440 || freq < 430) {
 		std::cout <<  "ERROR: The desired receiving frequency is outside of the bounds of 430 MHHz and 440 MHz." << std::endl;
 	}
-	uint16_t offset = (freq - 430) * 80;												// pp. 22
+	uint16_t offset = (uint16_t)((freq - 430) * 80);									// pp. 22
 	setRxFreqOffset(offset);
 }
 
-uint16_t UHF_Transceiver::getRxFreq() {
+float UHF_Transceiver::getRxFreq() {
 	uint16_t offset = getRxFreqOffset();
-	uint16_t freq = (offset + 430) * 0.0125;											// pp. 22
+	float freq = (offset + 430) * 0.0125;												// pp. 22
 	return freq;
 }
 
@@ -221,17 +221,17 @@ void UHF_Transceiver::setTxFreqOffset(uint16_t offset) {
 	i2c.write2(TX_OFFSET, offset);
 }
 
-void UHF_Transceiver::setTxFreq(uint16_t freq) {
+void UHF_Transceiver::setTxFreq(float freq) {
 	if (freq > 440 || freq < 430) {
 		std::cout <<  "ERROR: The desired transmission frequency is outside of the bounds of 430 MHHz and 440 MHz." << std::endl;
 	}
-	uint16_t offset = (freq - 430) * 40;												// pp. 22
+	uint16_t offset = (uint16_t)((freq - 430) * 40);									// pp. 22
 	setTxFreqOffset(offset);
 }
 
-uint16_t UHF_Transceiver::getTxFreq() {
+float UHF_Transceiver::getTxFreq() {
 	uint16_t offset = getTxFreqOffset();
-	uint16_t freq = (offset + 430) * 0.025;												// pp. 22
+	float freq = (offset + 430) * 0.025;												// pp. 22
 	return freq;
 }
 
@@ -502,6 +502,10 @@ bool UHF_Transceiver::getTxLock() {
 
 	std::cout << out_str << std::endl;
 	return is_locked;
+}
+
+bool UHF_Transceiver::testLocks() {
+	return getTxLock() && getRxLock();
 }
 
 uint8_t UHF_Transceiver::getDTMFInfo() {

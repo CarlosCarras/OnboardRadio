@@ -4,7 +4,7 @@
  * @author      : Carlos Carrasquillo
  * @contact     : c.carrasquillo@ufl.edu
  * @created     : November 11, 2020
- * @modified    : February 12, 2021
+ * @modified    : March 19, 2021
  * @description : controls the transmitting and receiving capabilities of the UHF transceiver over the I2C bus.
  * @hardware    : URTX CPUT Transeiver (Cape Peninsula University of Technology)
  *
@@ -18,6 +18,19 @@
 
 Packager::Packager(UHF_Transceiver* transceiver) {
     this->transceiver = transceiver;
+}
+
+int Packager::sendPacket(packet_t* outbound) {
+    std::string data;
+
+    data += (char)(outbound.preamble >> 8);
+    data += (char)(outbound.preamble & 0xFF);
+    data += (char)outbound.data_length;
+    data += outbound.data;
+    data += (char)outbound.checksum;
+
+    transmitString(data);
+    return 0;
 }
 
 int Packager::getNumPackets(const std::string &data) {
@@ -46,11 +59,12 @@ packet_t Packager::composePacket(const std::string &data) {
 
 int Packager::send256Bytes(const std::string &str) {
     if (str.length() > 256) {
+        std::cout << "ERROR: Attemoting to send more than 256 bytes." << outbound.data << std::endl;
         return -1;
     }
 
     packet_t outbound = composePacket(str);
-    sendPacket(outbound);
+    sendPacket(&outbound);
 
     std::cout << "Outbound Data: " << outbound.data << std::endl;
     std::cout << "Outbound Data Length: " << outbound.data_length << std::endl;
@@ -72,12 +86,13 @@ int Packager::sendString(const std::string &str) {
 
 int Packager::sendFile(const std::string &filename) {
     char buffer[DATAFIELD_LEN];
-    std::string str;
+    std::string data_str;
     unsigned int i = 0;
-
+    
     std::ifstream outFile(filename);
     char c;
 
+    buffer[i++] = SOF;
     if (outFile.is_open()) {
         while (outFile.get(c)) {
                 buffer[i++] = c;
@@ -87,31 +102,16 @@ int Packager::sendFile(const std::string &filename) {
                 }
         }
 
-        std::string last_packet = std::string(buffer);
-        send256Bytes(last_packet.substr(0, i));
+        buffer[i++] = EOF;
+        data_str = std::string(buffer);
+        send256Bytes(data_str.substr(0, i));
 
         outFile.close();
     } else {
         return -1;
     }
+
     return 0;
-}
-
-int Packager::sendPacket(packet_t outbound) {
-    std::string data;
-
-    data += (char)(outbound.preamble >> 8);
-    data += (char)(outbound.preamble & 0xFF);
-    data += (char)outbound.data_length;
-    data += outbound.data;
-    data += (char)outbound.checksum;
-
-    transmitStringTest(data);       // REMOVE 'Test' AFTER TESTING
-    return 0;
-}
-
-void Packager::transmitByte(uint8_t data) {
-    transceiver->sendByte(data);
 }
 
 void Packager::transmitString(std::string data) {

@@ -26,7 +26,7 @@ class Interpreter {
 private:
     UHF_Transceiver* transceiver;
     packet_t composePacket(uint8_t* data, int n);
-    command_t composeCommand(packet_t inbound_packet);
+    command_t composeCommand(packet_t* inbound_packet);
 
 public:
     explicit Interpreter(UHF_Transceiver* transceiver);

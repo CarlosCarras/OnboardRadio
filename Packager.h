@@ -4,7 +4,7 @@
  * @author      : Carlos Carrasquillo
  * @contact     : c.carrasquillo@ufl.edu
  * @created     : November 11, 2020
- * @modified    : February 12, 2021
+ * @modified    : March 19, 2021
  * @description : controls the transmitting and receiving capabilities of the UHF transceiver over the I2C bus.
  * @hardware    : URTX CPUT Transeiver (Cape Peninsula University of Technology)
  *
@@ -34,7 +34,6 @@ private:
     static uint8_t getChecksum(const std::string &data);
 	packet_t composePacket(const std::string &data);
     int send256Bytes(const std::string &str);
-    void transmitByte(uint8_t data);
 	void transmitString(std::string data);
 
 	void transmitStringTest(std::string data);
@@ -44,7 +43,7 @@ public:
     int getNumPackets(const std::string &data);
     int sendString(const std::string &str);
     int sendFile(const std::string &filename);
-    int sendPacket(packet_t outbound);
+    int sendPacket(packet_t* outbound);
 	
 	void debug_toggle(int led);
 	void debug_on(int led);

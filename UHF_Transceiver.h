@@ -7,7 +7,7 @@
 * @author      : Carlos Carrasquillo
 * @contact     : c.carrasquillo@ufl.edu
 * @date        : August 20, 2020
-* @modified    : February 12, 2021
+* @modified    : March 19, 2021
 *
 * Property of ADAMUS lab, University of Florida.
 ****************************************************************************/
@@ -65,6 +65,17 @@
 #define PA_POWER_FORWARD 		0x36  	// value used to compute actual forward power
 #define PA_POWER_REVERSE 		0x38 	// value used to compute actual reverse power
 
+/* 13.4.1 Register 0x00: Modem configuration register */
+#define MODEM_GMSK_DOWN			0b01
+#define MODEM_GMSK_UP			0b10
+#define MODEM_GMSK_BOTH			0b11
+
+/* 13.4.7 Register 0x06: PA power level register */
+#define PA_LVL_27				0b00
+#define PA_LVL_30				0b01
+#define PA_LVL_33				0b10
+#define PA_LVL_INHIBIT			0b11
+
 
 /********************* UHF Transceiver  **********************/
 class UHF_Transceiver {
@@ -101,10 +112,10 @@ public:
 	void setBeaconData(uint8_t data);						// sets the beacon data
 	uint8_t getPAPower();									// gets the Power Amplifier power level
 	void setPAPower(uint8_t config);						// sets the Power Amplifier power level
-	void setRxFreq(uint16_t freq);							// set receiving requency
-	uint16_t getRxFreq();									// get receiving requency
-	void setTxFreq(uint16_t freq);							// set transmission requency
-	uint16_t getTxFreq();									// get transmission requency
+	void setRxFreq(float freq);								// set receiving requency
+	float getRxFreq();										// get receiving requency
+	void setTxFreq(float freq);								// set transmission requency
+	float getTxFreq();									// get transmission requency
 	void setInitialTimeout(uint8_t timeout);				// set beacon’s initial I2C timeout
 	uint8_t getInitialTimeout();							// get beacon’s initial I2C timeout
 	void setRecurringTimeout(uint8_t timeout);				// set beacon’s recurring I2C timeout
@@ -133,6 +144,7 @@ public:
 	uint16_t getTxBufferOverrunCnt();						// number of bytes written to transmit buffer when there are no free slots available.
 	bool getRxLock();										// determines whether receiving frequency lock has been achieved
 	bool getTxLock();										// determines whether transmission frequency lock has been achieved
+	bool testLocks();										// determines whether both the rx and tx frequency locks have been achieved
 	uint8_t getLastDTMFTone();								// get the last Dual-Tone Multi-Frequency (DTMF) [see table 6, pp. 18]
 	uint8_t getDTMFToneCnt();								// get the count of DTMF tones received and decoded
 	float getRSSI();										// get the received signal strength indicator (RSSI) in Volts, pp. 26

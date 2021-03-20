@@ -15,23 +15,33 @@
 
 /************************** Includes **************************/
 #include <string>
+#include <fstream>
+#include <cstdio>
+#include <ctime>
+#include <unistd.h>
 #include "telecommands.h"
 #include "UHF_Transceiver.h"
+#include "Interpreter.h"
 #include "Packager.h"
 
 
 /************************** Handler ***************************/
 class Handler {
 private:
+    UHF_Transceiver* transceiver;
     Packager* packager;
-    int identify_response(command_t* incoming_command);
+
+    int identify_response(command_t* inbound_command);
+    void createFile(file_t* inbound_file);
+    int processFile(command_t* inbound_command);
     void sendFile(std::string filename);
     void acknowledge(void);
     void sendError(void);
 
 public:
     explicit Handler(UHF_Transceiver* transceiver);
-    int process(command_t* incoming_command);
+    int process(command_t* inbound_command);
+    ~Handler();
 
     /******************* Functions *******************/
     void debug_led_on(int led);
