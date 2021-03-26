@@ -433,16 +433,18 @@ uint8_t	UHF_Transceiver::readByte() {
 	return data;
 }
 
-uint8_t* UHF_Transceiver::readNBytes(int n) {
-	while(!receiveReady());
-	uint8_t* data = i2c.readn(RX_DATA, n);
+uint8_t* UHF_Transceiver::readNBytes(int n, uint8_t* data) {
+	/* requires {uint8_t data[n];} prior to call. the values are returned in the 'data' variable. */
+	while(!receiveReady());	// loop until ready to receive
+	i2c.readn(RX_DATA, n, data);
 	return data;
 }
 
-std::string UHF_Transceiver::readString(int n) {
-	uint8_t* incoming_raw = readNBytes(n);
-	std::string data = (char*)incoming_raw;
-	return data;
+std::string UHF_Transceiver::readString(int n, uint8_t* data) {
+	/* requires {uint8_t data[n];} prior to call. the values are returned in the 'data' variable. */
+	uint8_t* incoming_raw = readNBytes(n, data);
+	std::string str = (char*)incoming_raw;
+	return str;
 }
 
 /* NOT MEANT FOR USE */

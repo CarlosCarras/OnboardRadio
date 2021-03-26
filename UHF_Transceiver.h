@@ -134,8 +134,8 @@ public:
 	bool receiveReady();									// determines whether data can be received
 	uint16_t getRxBufferCount();							// determines number of bytes to be read from the receive buffer
 	uint8_t readByte();										// fetches the data from the received data buffer
-	uint8_t* readNBytes(int n);								// fetches 'n' bytes from the received data buffer
-	std::string readString(int n);							// fetches 'n' bytes from the received data buffer, returns string
+	uint8_t* readNBytes(int n, uint8_t* data);				// fetches 'n' bytes from the received data buffer
+	std::string readString(int n, uint8_t* data);			// fetches 'n' bytes from the received data buffer, returns string
 	std::string readUntilDelimiter(char delimiter);			// NOT MEANT FOR USE: reads data until a selected delimiter (e.g. EOF) is read
 	uint16_t getTxFreeSlots();								// determines number of free slots in the transmit buffer
 	uint16_t getRxCRCFailCnt();								// determines total number of AX.25 packets dropped due to AX.25 frame check sequence (FCS) failing

@@ -5,7 +5,7 @@
  * @author     : Carlos Carrasquillo
  * @contact    : c.carrasquillo@ufl.edu
  * @date       : July 16, 2020
- * @modified   : February 14, 2021
+ * @modified   : March 23, 2021
  *
  * Property of ADAMUS lab, University of Florida.
  ****************************************************************************/
@@ -17,11 +17,11 @@ I2C_Functions::I2C_Functions() {
 	set_address(0);
 }
 
-I2C_Functions::I2C_Functions(uint8_t bus, uint8_t device_addr) {
+I2C_Functions::I2C_Functions(uint8_t bus, uint8_t device_addr, bool endianness) {
 	I2CBus = bus;
+	std::cout << "New Device Created! Device Address: " << std::hex << static_cast<int>(device_addr) << "\n" << std::endl;
 	set_address(device_addr);
-	std::cout << "New Device Created! Device Address: " << std::hex << static_cast<int>(device_addr) << std::endl;
-	std::cout << std::endl;
+	this->endianness = endianness;
 }
 
 void I2C_Functions::set_address(uint8_t new_addr) {
@@ -39,22 +39,38 @@ uint8_t I2C_Functions::get_address() {
 	return (I2CAddr_Write >> 1) & 0x7F;
 }
 
-void I2C_Functions::write(uint8_t reg, uint8_t data) {
+int I2C_Functions::write(uint8_t reg, uint8_t data) {
+	int status; 
+
 	uint16_t write_sequence[] = {I2CAddr_Write, reg, data};
 
 	int handle = i2c_open(I2CBus);
-	i2c_send_sequence(handle, write_sequence, 3, 0);
+	status = i2c_send_sequence(handle, write_sequence, 3, 0);
 	i2c_close(handle);
+
+	return status;
 }
 
-void I2C_Functions::write2(uint8_t reg, uint16_t data) {
-	uint8_t byte0 = (data >> 0) & 0xFF;
-	uint8_t byte1 = (data >> 8) & 0xFF;
-	write(reg, byte1);
-	write(reg+1, byte0);
+int I2C_Functions::write2(uint8_t reg, uint16_t data) {
+	int status; 
+
+	uint8_t low = (data >> 0) & 0xFF;
+	uint8_t high = (data >> 8) & 0xFF;
+
+	if (endianness == C_BIG_ENDIAN) {
+		write(reg, high);
+		status = write(reg+1, low);
+	} else {
+		write(reg, low);
+		status = write(reg+1, high);
+	}
+
+	return status;
 }
 
-void I2C_Functions::writen(uint8_t reg, uint8_t* data, int n) {
+int I2C_Functions::writen(uint8_t reg, uint8_t* data, int n) {
+	int status; 
+
 	int m = 2;									// initial write sequence length
 	int write_seq_len = n+m;
 	uint16_t write_sequence[write_seq_len] = {I2CAddr_Write, reg};
@@ -64,8 +80,10 @@ void I2C_Functions::writen(uint8_t reg, uint8_t* data, int n) {
 	}
 
 	int handle = i2c_open(I2CBus);
-	i2c_send_sequence(handle, write_sequence, write_seq_len, 0);
+	status = i2c_send_sequence(handle, write_sequence, write_seq_len, 0);
 	i2c_close(handle);
+
+	return status;
 }
 
 uint8_t I2C_Functions::read(uint8_t reg) {
@@ -87,24 +105,27 @@ uint16_t I2C_Functions::read2(uint8_t reg) {
 	i2c_send_sequence(handle, read_sequence, 6, &data_received[0]);
 	i2c_close(handle);
 
-	uint16_t data_read = (((uint16_t)data_received[1])<<8) | ((uint16_t)data_received[0]);
+	uint16_t data_read;
+	if (endianness == C_BIG_ENDIAN) data_read = (((uint16_t)data_received[0])<<8) | ((uint16_t)data_received[1]);
+	else 						    data_read = (((uint16_t)data_received[1])<<8) | ((uint16_t)data_received[0]);
+	
 	return data_read;
 }
 
-uint8_t* I2C_Functions::readn(uint8_t reg, int n) {
+uint8_t* I2C_Functions::readn(uint8_t reg, int n, uint8_t* data_received) {
+	/* requires {uint8_t data[n];} prior to call. the values are returned in the 'data' variable. */
 	int m = 4;					// initial read sequence length
 	int read_seq_len = m+n;
 	uint16_t read_sequence[read_seq_len] = {I2CAddr_Write, reg, I2C_RESTART, I2CAddr_Read};
 	for (int i = m; i < read_seq_len; i++) {
 		read_sequence[i] = I2C_READ;
 	}
-	uint8_t data_received[n] = {0};
 
 	int handle = i2c_open(I2CBus);
 	i2c_send_sequence(handle, read_sequence, read_seq_len, &data_received[0]);
 	i2c_close(handle);
 
-	return &data_received[0];
+	return data_received;
 }
 
 /********************* Visualize *******************/

@@ -43,7 +43,7 @@ struct command_t {
 };
 
 struct file_t {
-	std::string telecommand;
+	uint8_t telecommand;
 	uint8_t len_dest;
 	std::string dest;
 	char sof;					// start of file

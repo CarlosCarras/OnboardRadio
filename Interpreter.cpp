@@ -23,7 +23,8 @@ command_t Interpreter::getCommand() {
     command_t inbound_command;
 
     if (n != 0) {
-        uint8_t* data = transceiver->readNBytes(n);
+        uint8_t data[n];
+        transceiver->readNBytes(n, data);
         inbound_packet = composePacket(data, n);
         inbound_command = composeCommand(&inbound_packet);
     } else {
@@ -47,7 +48,7 @@ packet_t Interpreter::composePacket(uint8_t* data_arr, int n) {
 
 command_t Interpreter::composeCommand(packet_t* inbound_packet) {
     command_t inbound_command;
-    inbound_command.telecommand = (uint8_t)(inbound_packet->data.substr(0,1));
+    inbound_command.telecommand = (uint8_t)inbound_packet->data.at(0);
     inbound_command.params = inbound_packet->data.substr(1);
 
     return inbound_command;

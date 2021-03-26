@@ -32,7 +32,7 @@ private:
     Packager* packager;
 
     int identify_response(command_t* inbound_command);
-    void createFile(file_t* inbound_file);
+    int createFile(file_t* inbound_file);
     int processFile(command_t* inbound_command);
     void sendFile(std::string filename);
     void acknowledge(void);
@@ -48,6 +48,5 @@ public:
     void debug_led_off(int led);
     void debug_led_toggle(int led);
 };
-
 
 #endif //HANDLER_H

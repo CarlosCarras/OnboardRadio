@@ -24,10 +24,11 @@ int Handler::process(command_t* inbound_command) {
     return status;
 }
 
-void Handler::createFile(file_t* inbound_file) {
-    std::ofstream new_file(inbound_file.dest);
-    new_file << inbound_file.data;
+int Handler::createFile(file_t* inbound_file) {
+    std::ofstream new_file(inbound_file->dest);
+    new_file << inbound_file->data;
     new_file.close();
+    return 0;
 }
 
 int Handler::processFile(command_t* inbound_command) {
@@ -36,18 +37,19 @@ int Handler::processFile(command_t* inbound_command) {
     file_t inbound_file;
 
     inbound_file.telecommand = inbound_command->telecommand;
-    inbound_file.len_dest = inbound_command->params.at(0);
-    inbound_file.dest = inbound_command->params.substr(1, len_dest);
-    inbound_file.sof = inbound_command->params.substr(len_dest+1, 1);
+    uint8_t n = inbound_command->params.at(0);
+    inbound_file.len_dest = n;
+    inbound_file.dest = inbound_command->params.substr(1, n);
+    inbound_file.sof = inbound_command->params.at(n+1);
     if (inbound_file.sof != SOF) {
         std::cout << "Error: Start of File (SOF) character " << std::to_string(SOF) << " not found. Aborting." << std::endl;
         return -1;
     }
-    inbound_file.data = inbound_command->params.substr(len_dest+2);
+    inbound_file.data = inbound_command->params.substr(n+2);
 
     // if the file is transmitted over multiple packets... 
     if (inbound_file.data.back() != EOF) {
-        interpreter = new interpreter(transceiver);
+        Interpreter interpreter(transceiver);
         command_t next_command;
 
         // initializing timer
@@ -77,8 +79,6 @@ int Handler::processFile(command_t* inbound_command) {
             }
 
         } while (inbound_file.data.back() != EOF);      // loops until EOF char is found or timer expires
-
-        delete(interpreter);
     }
 
     inbound_file.data.pop_back();                       // erases EOF character
@@ -93,11 +93,11 @@ void Handler::sendFile(std::string filename) {
 }
 
 void Handler::acknowledge(void) {
-    packager->sendString(ACKNOWLEDGE);
+    packager->sendString(std::to_string(ACKNOWLEDGE));
 }
 
 void Handler::sendError(void) {
-    packager->sendString(ERROR);
+    packager->sendString(std::to_string(ERROR));
 }
 
 int Handler::identify_response(command_t* inbound_command) {

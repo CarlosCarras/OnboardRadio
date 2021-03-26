@@ -23,11 +23,11 @@ Packager::Packager(UHF_Transceiver* transceiver) {
 int Packager::sendPacket(packet_t* outbound) {
     std::string data;
 
-    data += (char)(outbound.preamble >> 8);
-    data += (char)(outbound.preamble & 0xFF);
-    data += (char)outbound.data_length;
-    data += outbound.data;
-    data += (char)outbound.checksum;
+    data += (char)(outbound->preamble >> 8);
+    data += (char)(outbound->preamble & 0xFF);
+    data += (char)outbound->data_length;
+    data += outbound->data;
+    data += (char)outbound->checksum;
 
     transmitString(data);
     return 0;
@@ -59,7 +59,7 @@ packet_t Packager::composePacket(const std::string &data) {
 
 int Packager::send256Bytes(const std::string &str) {
     if (str.length() > 256) {
-        std::cout << "ERROR: Attemoting to send more than 256 bytes." << outbound.data << std::endl;
+        std::cout << "ERROR: Attemoting to send more than 256 bytes." << std::endl;
         return -1;
     }
 

@@ -17,11 +17,11 @@
 #include "Handler.h"
 #include "Interpreter.h"
 
-#define 
 
 #define MODEM_CONFIG_VAL MODEM_GMSK_BOTH
 #define PA_POWER_VAL     PA_LVL_33
 #define FREQ_VAL		 437.08		// MHz
+
 
 class Radio {
 private:
