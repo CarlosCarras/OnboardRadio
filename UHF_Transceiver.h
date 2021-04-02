@@ -24,7 +24,7 @@
 
 
 /*************************** Defines ***************************/
-#define TRANSCEIVER_I2C_ADDR  	 	 0x25
+#define TRANSCEIVER_I2C_ADDR    0x25
 
 // Registers (pp. 19 of 31)                DESCRIPTION
 #define MODEM_CONFIG			0x00	// select uplink and downlink modulation scheme
@@ -76,6 +76,11 @@
 #define PA_LVL_33				0b10
 #define PA_LVL_INHIBIT			0b11
 
+/* 13.4.14 Register 0x10: Transparent mode register */
+#define AX25_MODE				0x06
+#define TRANS_MODE_CONV_ENABLE  0x0D
+#define TRANS_MODE_CONV_DISABLE 0x05
+
 
 /********************* UHF Transceiver  **********************/
 class UHF_Transceiver {
@@ -94,8 +99,13 @@ private:
 	uint16_t getPAForwardPower();							// gets raw, unconverted PA forward power reading
 	uint16_t getPAReversePower();							// gets raw, unconverted PA reverse power reading	
 
+	/* Debug Functions */
+    bool debug;
+    void printe(std::string str) { if (debug) std::cout << "ERROR: " << str << " (ICM20948.cpp)" << std::endl; }
+	void printi(std::string str) { if (debug) std::cout << "INFO: " << str << " (ICM20948.cpp)" << std::endl; }
+
 public: 
-    explicit UHF_Transceiver(uint8_t bus = 2);
+    explicit UHF_Transceiver(bool debug = false, uint8_t bus = 2);
 	uint8_t getModemConfig();								// reports modulation scheme
 	void setModemConfig(uint8_t config);					// sets modulation scheme
 	void setTransmissionDelay(uint8_t delay);				// sets AX.25 transmission delay (1-255)
@@ -134,8 +144,8 @@ public:
 	bool receiveReady();									// determines whether data can be received
 	uint16_t getRxBufferCount();							// determines number of bytes to be read from the receive buffer
 	uint8_t readByte();										// fetches the data from the received data buffer
-	uint8_t* readNBytes(int n, uint8_t* data);				// fetches 'n' bytes from the received data buffer
-	std::string readString(int n, uint8_t* data);			// fetches 'n' bytes from the received data buffer, returns string
+	uint8_t* readNBytes(int n);								// fetches 'n' bytes from the received data buffer
+	std::string readString(int n);							// fetches 'n' bytes from the received data buffer, returns string
 	std::string readUntilDelimiter(char delimiter);			// NOT MEANT FOR USE: reads data until a selected delimiter (e.g. EOF) is read
 	uint16_t getTxFreeSlots();								// determines number of free slots in the transmit buffer
 	uint16_t getRxCRCFailCnt();								// determines total number of AX.25 packets dropped due to AX.25 frame check sequence (FCS) failing

@@ -15,7 +15,7 @@
 
 
 Radio::Radio() {
-    transceiver = new UHF_Transceiver();
+    transceiver = new UHF_Transceiver(DEBUG);
     handler = new Handler(transceiver);
     interpreter = new Interpreter(transceiver);
 
@@ -23,30 +23,31 @@ Radio::Radio() {
 }
 
 void Radio::config() {
-    transceiver->setModemConfig(MODEM_CONFIG_VAL);
-    transceiver->setPAPower(PA_POWER_VAL);
-    transceiver->setRxFreq(FREQ_VAL);
-    transceiver->setTxFreq(FREQ_VAL);
+    transceiver.setModemConfig(MODEM_CONFIG_VAL);
+    transceiver.setPAPower(PA_POWER_VAL);
+    transceiver.setRxFreq(FREQ_VAL);
+    transceiver.setTxFreq(FREQ_VAL);
+    transceiver.setMode(TRANS_MODE_CONV_DISABLE);
 
     resolveLock();
 }
 
 void Radio::resolveLock() {
-    while (transceiver->testLocks());
+    while (transceiver.testLocks());
 }
 
 void Radio::checkHealth() {
-    if (transceiver->getModemConfig() != MODEM_CONFIG_VAL) {
-        transceiver->setModemConfig(MODEM_CONFIG_VAL);
+    if (transceiver.getModemConfig() != MODEM_CONFIG_VAL) {
+        transceiver.setModemConfig(MODEM_CONFIG_VAL);
     }
-    if (transceiver->getPAPower() != PA_POWER_VAL) {
-        transceiver->setPAPower(PA_POWER_VAL);
+    if (transceiver.getPAPower() != PA_POWER_VAL) {
+        transceiver.setPAPower(PA_POWER_VAL);
     }
-    if (transceiver->getTxFreq() != FREQ_VAL) {
-        transceiver->setTxFreq(FREQ_VAL);
+    if (transceiver.getTxFreq() != FREQ_VAL) {
+        transceiver.setTxFreq(FREQ_VAL);
     }
-    if (transceiver->getRxFreq() != FREQ_VAL) {
-        transceiver->setRxFreq(FREQ_VAL);
+    if (transceiver.getRxFreq() != FREQ_VAL) {
+        transceiver.setRxFreq(FREQ_VAL);
     }
 
 
@@ -82,11 +83,11 @@ void Radio::test_config(int setting) {
 
     switch(setting) {
         case 0: 
-            transceiver->setPAPower(PA_LVL_27);
+            transceiver.setPAPower(PA_LVL_27);
         case 1: 
-            transceiver->setPAPower(PA_LVL_30);
+            transceiver.setPAPower(PA_LVL_30);
         case 2:
-            transceiver->setPAPower(PA_LVL_33);
+            transceiver.setPAPower(PA_LVL_33);
     }
 }
 
