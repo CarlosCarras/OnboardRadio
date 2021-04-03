@@ -11,18 +11,13 @@
 
 int main(int argc, char *argv[]) {
 	int config = 0;
-	if (argc > 3) {
-		std::cout << "Error: Too many command line arguements." << std::endl;
-	} else if (argc == 2) {
-		config = atoi(argv[1]);
-	}
-
     UHF_Transceiver* transceiver;
     Radio radio(config);
 
     while(1) {
+            // radio.sendString("This is a test!");
             radio.test_scan();
-            sleep(2);
+            sleep(1);
     }
 
     delete(transceiver);

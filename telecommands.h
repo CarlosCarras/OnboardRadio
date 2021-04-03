@@ -17,7 +17,7 @@
 #include <stdint.h>
 #include <string>
 
-#define ACKNOWLEDGE              0xBB
+#define ACKNOWLEDGE              0x40
 #define ERROR                    0x32
 
 #define TELECOM_UPLOAD_GUIDANCE	 0xC9

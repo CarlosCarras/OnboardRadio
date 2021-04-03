@@ -92,12 +92,18 @@ void Handler::sendFile(std::string filename) {
     packager->sendFile(filename);
 }
 
+void Handler::sendSignal(uint8_t signal) {
+    std::string out_str;
+    out_str += (char)signal;
+    packager->sendString(out_str);
+}
+
 void Handler::acknowledge(void) {
-    packager->sendString(std::to_string(ACKNOWLEDGE));
+    sendSignal(ACKNOWLEDGE);
 }
 
 void Handler::sendError(void) {
-    packager->sendString(std::to_string(ERROR));
+    sendSignal(ERROR);
 }
 
 int Handler::identify_response(command_t* inbound_command) {
@@ -111,12 +117,15 @@ int Handler::identify_response(command_t* inbound_command) {
     else if (telecom == TELECOM_GET_HEALTH)             sendFile("health.csv");
     else if (telecom == TELECOM_DEBUG_ON) {
         debug_led_on(0);
+        acknowledge();
     }
     else if (telecom == TELECOM_DEBUG_OFF) {
         debug_led_off(0);
+        acknowledge();
     }
     else if (telecom == TELECOM_DEBUG_TOGGLE) {
         debug_led_toggle(0);
+        acknowledge();
     }
     else if (telecom == TELECOM_GET_HEALTH)             sendFile("health.csv");
     else if (telecom == TELECOM_OVERRIDE_ANTENNA)       acknowledge();

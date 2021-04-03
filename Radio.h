@@ -17,11 +17,11 @@
 #include "Handler.h"
 #include "Interpreter.h"
 
-#define DEBUG 1
 
 #define MODEM_CONFIG_VAL MODEM_GMSK_BOTH
-#define PA_POWER_VAL     PA_LVL_33
+#define PA_POWER_VAL     PA_LVL_27
 #define FREQ_VAL		 437.08		// MHz
+
 
 class Radio {
 private:
@@ -42,6 +42,8 @@ public:
     explicit Radio(int setting);
     int test_scan();
     void test_config(int setting);
+    void toggle_led(int led);
+    void sendString(std::string str);
 };
 
 #endif //RADIO_H

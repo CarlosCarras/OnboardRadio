@@ -22,6 +22,7 @@ Packager::Packager(UHF_Transceiver* transceiver) {
 
 int Packager::sendPacket(packet_t* outbound) {
     std::string data;
+    std::string packet_str;
 
     data += (char)(outbound->preamble >> 8);
     data += (char)(outbound->preamble & 0xFF);
@@ -29,7 +30,8 @@ int Packager::sendPacket(packet_t* outbound) {
     data += outbound->data;
     data += (char)outbound->checksum;
 
-    transmitString(data);
+    uint8_t str_len = outbound->data_length + 5;
+    transmitString(data, str_len);
     return 0;
 }
 
@@ -50,7 +52,7 @@ uint8_t Packager::getChecksum(const std::string &data) {
 packet_t Packager::composePacket(const std::string &data) {
     packet_t outbound;
     outbound.checksum = getChecksum(data);
-    outbound.data_length = (uint8_t)data.length();
+    outbound.data_length = (uint8_t)data.length()-1;
     outbound.data = data;
     outbound.preamble = TRANSMIT_PREAMBLE;
 
@@ -114,8 +116,8 @@ int Packager::sendFile(const std::string &filename) {
     return 0;
 }
 
-void Packager::transmitString(std::string data) {
-    transceiver->sendString(data);
+void Packager::transmitString(std::string data, uint8_t n) {
+    transceiver->sendString(data, n);
 }
 
 /************** Debug ***************/
@@ -132,6 +134,6 @@ void Packager::debug_off(int led) {
 	transceiver->ledOff(led);
 }
 
-void Packager::transmitStringTest(std::string data) {
-    transceiver->sendStringTest(data);
+void Packager::transmitStringTest(std::string data, uint8_t str_len) {
+    transceiver->sendStringTest(data, str_len);
 }

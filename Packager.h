@@ -34,9 +34,9 @@ private:
     static uint8_t getChecksum(const std::string &data);
 	packet_t composePacket(const std::string &data);
     int send256Bytes(const std::string &str);
-	void transmitString(std::string data);
+	void transmitString(std::string data, uint8_t str_len);
 
-	void transmitStringTest(std::string data);
+	void transmitStringTest(std::string data, uint8_t str_len);
 
 public:
     explicit Packager(UHF_Transceiver* transceiver);
