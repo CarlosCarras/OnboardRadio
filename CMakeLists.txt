@@ -1,6 +1,0 @@
-cmake_minimum_required(VERSION 3.17)
-project(OnboardRadio)
-
-set(CMAKE_CXX_STANDARD 14)
-
-add_executable(OnboardRadio main.cpp Packager.cpp Packager.h Handler.cpp Handler.h telecommands.h Interpreter.cpp Interpreter.h Radio.cpp Radio.h)
