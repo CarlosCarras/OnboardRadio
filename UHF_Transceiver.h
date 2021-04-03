@@ -76,6 +76,11 @@
 #define PA_LVL_33				0b10
 #define PA_LVL_INHIBIT			0b11
 
+/* 13.4.14 Register 0x10: Transparent mode register */
+#define AX25_MODE				0x06
+#define TRANS_MODE_CONV_ENABLE	0x0D
+#define TRANS_MODE_CONV_DISABLE 0x05
+
 
 /********************* UHF Transceiver  **********************/
 class UHF_Transceiver {
@@ -94,8 +99,13 @@ private:
 	uint16_t getPAForwardPower();							// gets raw, unconverted PA forward power reading
 	uint16_t getPAReversePower();							// gets raw, unconverted PA reverse power reading	
 
+	/* Debug Functions */
+    bool debug;
+    void printe(std::string str) { if (debug) std::cout << "ERROR: " << str << " (UHF_Transceiver.cpp)" << std::endl; }
+	void printi(std::string str) { if (debug) std::cout << "INFO: " << str << " (UHF_Transceiver.cpp)" << std::endl; }	
+
 public: 
-    explicit UHF_Transceiver(uint8_t bus = 2);
+    explicit UHF_Transceiver(bool debug = true, uint8_t bus = 2);
 	uint8_t getModemConfig();								// reports modulation scheme
 	void setModemConfig(uint8_t config);					// sets modulation scheme
 	void setTransmissionDelay(uint8_t delay);				// sets AX.25 transmission delay (1-255)

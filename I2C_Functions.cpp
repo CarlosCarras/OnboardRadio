@@ -31,7 +31,6 @@ void I2C_Functions::set_address(uint8_t new_addr) {
 	if (new_addr != 0) {
 		std::cout << "Device Write Address: " << std::hex << static_cast<int>(I2CAddr_Write) << std::endl;
 		std::cout << "Device Read Address: " << std::hex << static_cast<int>(I2CAddr_Read) << std::endl;
-
 	}
 }
 

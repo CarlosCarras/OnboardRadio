@@ -15,7 +15,8 @@
 #include "UHF_Transceiver.h"
 
 
-UHF_Transceiver::UHF_Transceiver(uint8_t bus) {
+UHF_Transceiver::UHF_Transceiver(bool debug, uint8_t bus) {
+	this->debug = debug;
 	i2c = I2C_Functions(bus, TRANSCEIVER_I2C_ADDR);
 }
 
@@ -25,12 +26,15 @@ uint8_t UHF_Transceiver::getModemConfig() {
 
 	std::string out_str = "Modulation Scheme: ";
 
-	if      (config == MODEM_GMSK_DOWN) out_str += "9600 bps GMSK downlink, 1200 bps AFSK uplink.\n";
-	else if (config == MODEM_GMSK_UP)   out_str += "1200 bps AFSK downlink, 9600 bps GMSK uplink.\n";
-	else if (config == MODEM_GMSK_BOTH) out_str += "9600 bps GMSK downlink and uplink.\n";
-	else					            out_str += "ERROR: There was an error in the reception of the data.\n";
+	if      (config == MODEM_GMSK_DOWN) out_str += "9600 bps GMSK downlink, 1200 bps AFSK uplink.";
+	else if (config == MODEM_GMSK_UP)   out_str += "1200 bps AFSK downlink, 9600 bps GMSK uplink.";
+	else if (config == MODEM_GMSK_BOTH) out_str += "9600 bps GMSK downlink and uplink.";
+	else {
+		printe("There was an error in the reception of the data.");
+		return 0;
+	}
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return config;
 }
 
@@ -41,24 +45,24 @@ void UHF_Transceiver::setModemConfig(uint8_t config) {
 
 	switch (config) {
 		case MODEM_GMSK_DOWN:  
-			out_str += "9600 bps GMSK downlink, 1200 bps AFSK uplink.\n";
+			out_str += "9600 bps GMSK downlink, 1200 bps AFSK uplink.";
 			command = config;
 			break;
 		case MODEM_GMSK_UP: 
-			out_str += "1200 bps AFSK downlink, 9600 bps GMSK uplink.\n";
+			out_str += "1200 bps AFSK downlink, 9600 bps GMSK uplink.";
 			command = config; 
 			break;
 		case MODEM_GMSK_BOTH: 
-			out_str += "9600 bps GMSK downlink and uplink.\n";
+			out_str += "9600 bps GMSK downlink and uplink.";
 			command = config; 
 			break;
 		default: 
-			std::cout << "ERROR: Modulation scheme was not appropriate.\n";
+			printe("Modulation scheme was not appropriate.");
 			return;
 	}
 
 	i2c.write(MODEM_CONFIG, command);
-	std::cout << out_str << std::endl;
+	printi(out_str);
 }
 
 void UHF_Transceiver::setTransmissionDelay(uint8_t delay) {
@@ -100,12 +104,12 @@ void UHF_Transceiver::sendString(const std::string &data, uint8_t n) {
 
 uint8_t UHF_Transceiver::getBeaconCtrl() {
 	uint8_t status = i2c.read(BEACON_CTRL);
-	std::string out_str = "Beacon Status:\n";
+	std::string out_str = "Beacon Status: ";
 
-	if (BIT_VAL(status, 0))  out_str += "\tBeacon is currently enabled.\n";
-					    else out_str += "\tBeacon is currently disabled.\n";
+	if (BIT_VAL(status, 0))  out_str += "Beacon is currently enabled.";
+					    else out_str += "Beacon is currently disabled.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return status;
 }
 
@@ -143,12 +147,12 @@ uint8_t UHF_Transceiver::getPAPower() {
 
 	std::string out_str = "Power Amplifier Power Level: ";
 
-	if      (power == PA_LVL_27) out_str+= "27 dBm (0.5 W).\n";
-	else if (power == PA_LVL_30) out_str += "30 dBm (1 W).\n";
-	else if (power == PA_LVL_33) out_str += "33 dBm (2 W).\n";
-	else 	  			 	out_str += "Inhibit (0 dBm/W).\n";
+	if      (power == PA_LVL_27) out_str+= "27 dBm (0.5 W).";
+	else if (power == PA_LVL_30) out_str += "30 dBm (1 W).";
+	else if (power == PA_LVL_33) out_str += "33 dBm (2 W).";
+	else 	  			 	out_str += "Inhibit (0 dBm/W).";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return power;
 }
 
@@ -159,27 +163,27 @@ void UHF_Transceiver::setPAPower(uint8_t config) {
 
 	switch (config) {
 		case PA_LVL_27: 
-			out_str += "27 dBm (0.5 W).\n";
+			out_str += "27 dBm (0.5 W).";
 			command = PA_LVL_27; 
 			break;
 		case PA_LVL_30: 
-			out_str += "30 dBm (1 W).\n";
+			out_str += "30 dBm (1 W).";
 			command = PA_LVL_30; 
 			break;
 		case PA_LVL_33: 
-			out_str += "33 dBm (2 W).\n";
+			out_str += "33 dBm (2 W).";
 			command = PA_LVL_33; 
 			break;
 		case PA_LVL_INHIBIT:
-			out_str += "Inhibit (0 dBm/W).\n";
+			out_str += "Inhibit (0 dBm/W).";
 			command = PA_LVL_INHIBIT; 
 		default: 
-			std::cout << "ERROR: Modulation scheme was not appropriate.\n" << std::endl;
+			printe("Modulation scheme was not appropriate.");
 			return;
 	}
 
 	i2c.write(PA_POWER_LVL, command);
-	std::cout << out_str << std::endl;
+	printi(out_str);
 }
 
 uint16_t UHF_Transceiver::getRxFreqOffset() {
@@ -190,14 +194,14 @@ uint16_t UHF_Transceiver::getRxFreqOffset() {
 
 void UHF_Transceiver::setRxFreqOffset(uint16_t offset) {
 	if (offset > 1023) {
-		std::cout << "ERROR: Rx frequency offset is larger than 511." << std::endl;
+		printe("Rx frequency offset is larger than 511.");
 	}
 	i2c.write2(RX_OFFSET, offset);
 }
 
 void UHF_Transceiver::setRxFreq(float freq) {
 	if (freq > 440 || freq < 430) {
-		std::cout <<  "ERROR: The desired receiving frequency is outside of the bounds of 430 MHHz and 440 MHz." << std::endl;
+		printe("The desired receiving frequency is outside of the bounds of 430 MHHz and 440 MHz.");
 	}
 	uint16_t offset = (uint16_t)((freq - 430) * 80);									// pp. 22
 	setRxFreqOffset(offset);
@@ -217,14 +221,14 @@ uint16_t UHF_Transceiver::getTxFreqOffset() {
 
 void UHF_Transceiver::setTxFreqOffset(uint16_t offset) {
 	if (offset > 511) {
-		std::cout << "ERROR: Tx frequency offset is larger than 511." << std::endl;
+		printe("Tx frequency offset is larger than 511.");
 	}
 	i2c.write2(TX_OFFSET, offset);
 }
 
 void UHF_Transceiver::setTxFreq(float freq) {
 	if (freq > 440 || freq < 430) {
-		std::cout <<  "ERROR: The desired transmission frequency is outside of the bounds of 430 MHHz and 440 MHz." << std::endl;
+		printe("The desired transmission frequency is outside of the bounds of 430 MHHz and 440 MHz.");
 	}
 	uint16_t offset = (uint16_t)((freq - 430) * 40);									// pp. 22
 	setTxFreqOffset(offset);
@@ -262,10 +266,10 @@ uint8_t UHF_Transceiver::getDebug() {
 					   else out_str += "\tThe lock status of the receive and transmit synthesizers is DISABLED.\n";
 	if (BIT_VAL(status, 1)) out_str += "\tLED 1 is ON.\n";
 					   else out_str += "\tLED 1 is OFF.\n";
-	if (BIT_VAL(status, 0)) out_str += "\tLED 0 is ON.\n";
-					   else out_str += "\tLED 0 is OFF.\n";
+	if (BIT_VAL(status, 0)) out_str += "\tLED 0 is ON.";
+					   else out_str += "\tLED 0 is OFF.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return status;
 }
 
@@ -276,7 +280,7 @@ void UHF_Transceiver::ledOn(int led) {
 		i2c.write(DEBUG_REG, status);
 		return;
 	}
-	std::cout << "ERROR: Invalid LED." << std::endl;
+	printe("Invalid LED.");
 }
 
 void UHF_Transceiver::ledOff(int led) {
@@ -286,7 +290,7 @@ void UHF_Transceiver::ledOff(int led) {
 		i2c.write(DEBUG_REG, status);
 		return;
 	}
-	std::cout << "ERROR: Invalid LED." << std::endl;
+	printe("Invalid LED.");
 }
 
 void UHF_Transceiver::ledToggle(int led) {
@@ -296,7 +300,7 @@ void UHF_Transceiver::ledToggle(int led) {
 		i2c.write(DEBUG_REG, status);
 		return;
 	}
-	std::cout << "ERROR: Invalid LED." << std::endl;
+	printe("Invalid LED.");
 }
 
 void UHF_Transceiver::reset() {
@@ -309,40 +313,35 @@ uint8_t UHF_Transceiver::getMode() {
 
 	std::string out_str = "Operation Mode: ";
 
-	if      (config == 0x06) out_str += "AX.25.\n";
-	else if (config == 0x0D) out_str += "Transparent: convolutional encoder enabled.\n";
-	else if (config == 0x05) out_str += "Transparent: convolutional encoder disabled.\n";
-	else					 out_str += "ERROR: There was an error in the reception of the data.\n";
+	if      (config == AX25_MODE)               out_str += "AX.25.";
+	else if (config == TRANS_MODE_CONV_ENABLE)  out_str += "Transparent: convolutional encoder enabled.";
+	else if (config == TRANS_MODE_CONV_DISABLE) out_str += "Transparent: convolutional encoder disabled.";
+	else					                    out_str += "ERROR: There was an error in the reception of the data.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return config;
 }
 
 void UHF_Transceiver::setMode(uint8_t config) {
-	uint8_t command;
-
 	std::string out_str = "Operation Mode set to: ";
 
 	switch (config) {
-		case 0: 
-			out_str += "AX.25.\n";
-			command = 0x06; 
+		case AX25_MODE: 
+			out_str += "AX.25.";
 			break;
-		case 1: 
-			out_str += "Transparent: convolutional encoder enabled.\n";
-			command = 0x0D; 
+		case TRANS_MODE_CONV_ENABLE: 
+			out_str += "Transparent: convolutional encoder enabled.";
 			break;
-		case 2: 
-			out_str += "Transparent: convolutional encoder disabled.\n";
-			command = 0x05; 
+		case TRANS_MODE_CONV_DISABLE: 
+			out_str += "Transparent: convolutional encoder disabled.";
 			break;
 		default: 
-			std::cout << "ERROR: Selected operation mode was not appropriate.\n";
+			printe("Selected operation mode was not appropriate.");
 			return;
 	}
 
-	i2c.write(TRANSPARENT_MODE, command);
-	std::cout << out_str << std::endl;
+	i2c.write(TRANSPARENT_MODE, config);
+	printi(out_str);
 }
 
 uint16_t UHF_Transceiver::getTxThreshold() {
@@ -351,7 +350,7 @@ uint16_t UHF_Transceiver::getTxThreshold() {
 
 void UHF_Transceiver::setTxThreshold(uint16_t threshold) {
 	if (threshold > 8191) {
-		std::cout << "ERROR: The desired transmit ready threshold must be less than 8191.\n" << std::endl;
+		printe("The desired transmit ready threshold must be less than 8191.");
 		return;
 	}
 
@@ -379,7 +378,9 @@ uint8_t UHF_Transceiver::getFirmware() {
 	uint8_t major = (version >> 4) & 0xF;
 	uint8_t minor = (version >> 0) & 0xF;
 
-	std::cout << "Software Version: " << major << "." << minor << std::endl;
+	std::string out_str = "Software Version: " + std::to_string(major) + "." + std::to_string(minor);
+	printi(out_str);
+
 	return version;
 }
 
@@ -392,10 +393,10 @@ bool UHF_Transceiver::transmitReady() {
 	bool ready = BIT_VAL(status, 0);
 
 	std::string out_str = "Tx Status: ";
-	if (ready) out_str += "Ready to transmit.\n";
-	else 	   out_str += "Not ready to transmit.\n";
+	if (ready) out_str += "Ready to transmit.";
+	else 	   out_str += "Not ready to transmit.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return ready;
 }
 
@@ -404,10 +405,10 @@ bool UHF_Transceiver::receiveReady() {
 	bool ready = BIT_VAL(status, 1);
 	
 	std::string out_str = "Rx Status: ";
-	if (ready) out_str += "Ready to receive.\n";
-	else 	   out_str += "Not ready to receive.\n";
+	if (ready) out_str += "Ready to receive.";
+	else 	   out_str += "Not ready to receive.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return ready;
 }
 
@@ -415,10 +416,10 @@ uint16_t UHF_Transceiver::getRxBufferCount() {
 	uint16_t cnt = i2c.read2(RX_BUFFER_CNT);
 
 	std::string out_str = "Rx Queue Status: ";
-	if (!cnt) out_str += "No bytes in the receive queue.\n"; 							// pp. 24
-	else 	  out_str += std::to_string(cnt) + "bytes in the receive queue.\n";
+	if (!cnt) out_str += "No bytes in the receive queue."; 							// pp. 24
+	else 	  out_str += std::to_string(cnt) + "bytes in the receive queue.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return cnt;
 }
 
@@ -428,7 +429,7 @@ uint8_t	UHF_Transceiver::readByte() {
 
 	if (data == 0xFF) {
 		data = 0x00;		// returns null character
-		std::cout << "WARNING: No data available in the receive buffer.\n" << std::endl; // pp. 24
+		printi("No data available in the receive buffer."); // pp. 24
 	}
 
 	return data;
@@ -487,11 +488,11 @@ bool UHF_Transceiver::getRxLock() {
 	uint8_t status = getReadySignals();
 	bool is_locked = BIT_VAL(status, 0);
 
-	std::string out_str = "Rx Frequency Lock Status: ";
-	if (is_locked) out_str += "Locked.\n";
-	else           out_str += "Not locked.\n";
+	std::string    out_str  = "Rx Frequency Lock Status: ";
+	if (is_locked) out_str += "Locked.";
+	else           out_str += "Not locked.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return is_locked;
 }
 
@@ -500,10 +501,10 @@ bool UHF_Transceiver::getTxLock() {
 	bool is_locked = BIT_VAL(status, 1);
 
 	std::string out_str = "Tx Frequency Lock Status: ";
-	if (is_locked) out_str += "Locked.\n";
-	else           out_str += "Not locked.\n";
+	if (is_locked) out_str += "Locked.";
+	else           out_str += "Not locked.";
 
-	std::cout << out_str << std::endl;
+	printi(out_str);
 	return is_locked;
 }
 

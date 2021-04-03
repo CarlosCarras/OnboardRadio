@@ -35,7 +35,7 @@
 #define BIT_TOGGLE(x, bit) (x ^ (1 << bit))
 
 #define C_BIG_ENDIAN		0
-#define C_LITTLE_ENDIAN	1
+#define C_LITTLE_ENDIAN		1
 
 
 /************************** Functions **************************/
