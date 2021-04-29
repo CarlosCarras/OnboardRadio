@@ -19,6 +19,7 @@
 
 /* Uplinked Commands */
 #define TELECOM_UPLOAD_FILE	         0xF0
+#define TELECOM_GET_HISTORY          0x12
 #define TELECOM_GET_HEALTH           0x4C
 #define TELECOM_OVERRIDE_ANTENNA     0x6A
 #define TELECOM_DEBUG_ON             0xE0

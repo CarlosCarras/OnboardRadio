@@ -10,8 +10,8 @@
 * Property of ADAMUS lab, University of Florida.
 ****************************************************************************/
 
-#include "telecommands.h"
 #include "Radio.h"
+#include "telecommands.h"
 
 
 Radio::Radio() {

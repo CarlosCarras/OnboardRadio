@@ -12,6 +12,7 @@
 
 #include "Handler.h"
 #include "Actions.h"
+#include "ManageHistory.h"
 
 
 Handler::Handler(UHF_Transceiver* transceiver) {
@@ -48,6 +49,10 @@ int Handler::identify_response(command_t* inbound_command) {
     switch(telecom) {
         case TELECOM_UPLOAD_FILE:
             acknowledge();
+            break;
+        case TELECOM_GET_HISTORY:
+            cleanHistory();
+            sendFile(HISTORY_FILENAME);
             break;
         case TELECOM_GET_HEALTH:
             sendFile("health.csv");

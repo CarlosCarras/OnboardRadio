@@ -13,6 +13,7 @@
 #include "Interpreter.h"
 #include <fstream>
 #include <cstdio>
+#include "ManageHistory.h"
 
 
 Interpreter::Interpreter(UHF_Transceiver* transceiver) {
@@ -28,14 +29,13 @@ command_t Interpreter::getCommand() {
     packet_t inbound_packet;
     command_t inbound_command;
 
-    if (n != 0) {
-        uint8_t data[n];
-        transceiver->readNBytes(n, data);
-        inbound_packet = composePacket(data, n);
-        inbound_command = composeCommand(&inbound_packet);
-    } else {
-        return {0x00, "\0"};
-    }
+    if (n == 0) return {0x00, "\0"};
+
+    uint8_t data[n];
+    transceiver->readNBytes(n, data);
+    inbound_packet = composePacket(data, n);
+    inbound_command = composeCommand(&inbound_packet);
+    addToHistory(&inbound_command);
 
     if (incoming_command.telecommand == TELECOM_UPLOAD_FILE) {
         uploadFile(&incoming_command);
