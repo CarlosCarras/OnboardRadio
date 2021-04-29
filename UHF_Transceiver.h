@@ -24,7 +24,8 @@
 
 
 /*************************** Defines ***************************/
-#define TRANSCEIVER_I2C_ADDR  	 	 0x25
+#define TRANSCEIVER_I2C_ADDR    0x25
+#define DATAFIELD_LEN           256
 
 // Registers (pp. 19 of 31)                DESCRIPTION
 #define MODEM_CONFIG			0x00	// select uplink and downlink modulation scheme
@@ -69,6 +70,9 @@
 #define MODEM_GMSK_DOWN			0b01
 #define MODEM_GMSK_UP			0b10
 #define MODEM_GMSK_BOTH			0b11
+
+/* 13.4.6 Register 0x05: Beacon data register */
+#define BEACON_DATA_BUFFER_LEN  128
 
 /* 13.4.7 Register 0x06: PA power level register */
 #define PA_LVL_27				0b00
@@ -119,7 +123,8 @@ public:
 	void clearBeaconData();									// clears the beacon data
 	void enableBeacon();									// enables the beacon functionality
 	void disableBeacon();									// disables the beacon functionality
-	void setBeaconData(uint8_t data);						// sets the beacon data
+	void setBeaconData(uint8_t data);						// sets one byte of the beacon data
+	void setBeaconOutput(std::string str);					// sets the beacon data to a string
 	uint8_t getPAPower();									// gets the Power Amplifier power level
 	void setPAPower(uint8_t config);						// sets the Power Amplifier power level
 	void setRxFreq(float freq);								// set receiving requency

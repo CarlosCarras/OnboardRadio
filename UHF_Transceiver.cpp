@@ -141,6 +141,16 @@ void UHF_Transceiver::setBeaconData(uint8_t data) {
 	i2c.write(BEACON_DATA, data);
 }
 
+void UHF_Transceiver::setBeaconOutput(std::string str) {
+	if (str.length() > BEACON_DATA_BUFFER_LEN) {
+		str = str.substr(0, BEACON_DATA_BUFFER_LEN);
+	}
+
+	for (int i = 0; i < BEACON_DATA_BUFFER_LEN; i++) {
+		setBeaconData(str.at(i));
+	}
+}
+
 uint8_t UHF_Transceiver::getPAPower() {
 	uint8_t power = i2c.read(PA_POWER_LVL);
 	power &= 0b11;

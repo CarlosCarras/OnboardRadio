@@ -20,9 +20,5 @@ int main(int argc, char *argv[]) {
             sleep(1);
     }
 
-    delete(transceiver);
-    //std::string message = "hello world!";
-    //transceiver.sendString(message);
-
     return 0;
 }

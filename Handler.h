@@ -28,26 +28,23 @@
 /************************** Handler ***************************/
 class Handler {
 private:
-    UHF_Transceiver* transceiver;
     Packager* packager;
 
     int identify_response(command_t* inbound_command);
-    int createFile(file_t* inbound_file);
-    int processFile(command_t* inbound_command);
     void sendFile(std::string filename);
     void sendSignal(uint8_t signal);
     void acknowledge(void);
     void sendError(void);
 
+    /* Test Functions */
+    void debug_led_on(int led);
+    void debug_led_off(int led);
+    void debug_led_toggle(int led);
+
 public:
     explicit Handler(UHF_Transceiver* transceiver);
     int process(command_t* inbound_command);
     ~Handler();
-
-    /******************* Functions *******************/
-    void debug_led_on(int led);
-    void debug_led_off(int led);
-    void debug_led_toggle(int led);
 };
 
 #endif //HANDLER_H

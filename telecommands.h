@@ -5,7 +5,7 @@
 * @author      : Carlos Carrasquillo
 * @contact     : c.carrasquillo@ufl.edu
 * @date        : February 4, 2021
-* @modified    : March 19, 2021
+* @modified    : April 28, 2021
 *
 * Property of ADAMUS lab, University of Florida.
 ****************************************************************************/
@@ -17,18 +17,30 @@
 #include <stdint.h>
 #include <string>
 
-#define ACKNOWLEDGE              0x40
-#define ERROR                    0x32
+/* Uplinked Commands */
+#define TELECOM_UPLOAD_FILE	         0xF0
+#define TELECOM_GET_HEALTH           0x4C
+#define TELECOM_OVERRIDE_ANTENNA     0x6A
+#define TELECOM_DEBUG_ON             0xE0
+#define TELECOM_DEBUG_OFF            0x0F
+#define TELECOM_DEBUG_TOGGLE         0xAA
 
-#define TELECOM_UPLOAD_GUIDANCE	 0xC9
-#define TELECOM_GET_HEALTH       0x4C
-#define TELECOM_OVERRIDE_ANTENNA 0x6A
-#define TELECOM_DEBUG_ON         0xF0
-#define TELECOM_DEBUG_OFF        0x0F
-#define TELECOM_DEBUG_TOGGLE     0xAA
+/* Downlinked Commands */
+#define ACKNOWLEDGE                  0x40
+#define TELECOM_LAST_PACKET_RECEIVED 0x11
+#define TELECOM_DOWNLINK_FILE		 0x45
+#define TELECOM_DOWNLINK_STRING      0x46
 
-#define SOF 					 0x02     // start of text in ASCII
-#define EOT		     		     0x03     // end of text in ASCII
+/* Downlinked Errors */
+#define ERROR                        0x32
+#define TELECOM_PAKCET_LOSS          0xE6
+#define TELECOM_PACKET_LOSS_RESET    0xE7
+#define TELECOM_PACKET_FORMAT_ERR    0xE8
+#define TELECOM_FILE_UNAVAILABLE     0xE9
+
+/* File Markers */
+#define SOF 					     0x02     // start of text in ASCII
+#define EOT		     		         0x03     // end of text in ASCII
 
 struct packet_t {
     uint16_t preamble;
@@ -44,11 +56,10 @@ struct command_t {
 
 struct file_t {
 	uint8_t telecommand;
+	uint8_t num_packets;
 	uint8_t len_dest;
 	std::string dest;
-	char sof;					// start of file
 	std::string data;
-	char eof;					// end of file
 };
 
 #endif //TELECOMMANDS_H
