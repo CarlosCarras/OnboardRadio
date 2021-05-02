@@ -64,6 +64,12 @@ command_t Interpreter::composeCommand(packet_t* inbound_packet) {
     return inbound_command;
 }
 
+void Interpreter::backupFile(const std::string& filename) {
+    std::string newname = filename + BACKUP_EXT;
+    remove(newname.c_str());                       // delete the backup file if the backup already exists
+    rename(filename, newname);                     // create a new backup file if the file already exists
+}
+
 /*
  * First Packet Params Field:
  * Bytes:   |      1        |       1           |              1              |    1-251    |  1  |  0-250 |
@@ -112,7 +118,9 @@ int Interpreter::uploadFile(command_t* incoming_command) {
             return -1;
         }
 
-        std::ofstream newFile(last_file.dest, std::ofstream::trunc);
+        backupFile(last_file.dest);                                                 // if the file exists, save a backup
+        std::ofstream newFile(last_file.dest.c_str(), std::ofstream::trunc);
+
         if (!newfile.is_open()) {
             /* The destination was not found. */
             std::cout << "Error: The file destination: '" << last_file.dest << "' was not found." << std::endl;
@@ -150,7 +158,7 @@ int Interpreter::uploadFile(command_t* incoming_command) {
         last_packet = true;
     }
 
-    std::ofstream file(last_file.dest);
+    std::ofstream file(last_file.dest.c_str());
     if (!file.is_open()) {
         /* this means that the destination was not found */
         std::cout << "Error: The file destination: '" << last_file.dest << "' was not found." << std::endl;

@@ -27,6 +27,7 @@ private:
     UHF_Transceiver* transceiver;
     packet_t composePacket(uint8_t* data, int n);
     command_t composeCommand(packet_t* inbound_packet);
+    void backupFile(const std::string& filename);
     int uploadFile(command_t* incoming_command);
 
     file_t last_file;

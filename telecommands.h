@@ -17,6 +17,8 @@
 #include <stdint.h>
 #include <string>
 
+#define BACKUP_EXT ".backup"
+
 /* Uplinked Commands */
 #define TELECOM_UPLOAD_FILE	         0xF0
 #define TELECOM_GET_HISTORY          0x12
