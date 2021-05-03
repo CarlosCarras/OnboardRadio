@@ -82,7 +82,7 @@ int Handler::identify_response(command_t* inbound_command) {
         case TELECOM_OVERRIDE_ANTENNA:
             acknowledge();
             break;
-        case TELECOM_SEND_ERROR:
+        case ERROR:
             sendError();
             break;
         case TELECOM_PACKET_LOSS:
@@ -91,8 +91,8 @@ int Handler::identify_response(command_t* inbound_command) {
         case TELECOM_PACKET_FORMAT_ERR:
             sendSignal(TELECOM_PACKET_FORMAT_ERR);
             break;
-        case LAST_PACKET_RECEIVED:
-            sendSignal(LAST_PACKET_RECEIVED);
+        case TELECOM_LAST_PACKET_RECEIVED:
+            sendSignal(TELECOM_LAST_PACKET_RECEIVED);
             break;
         default:
             std::cout << "ERROR: Unknown Telecommand." << std::endl;

@@ -53,7 +53,7 @@ public:
     /* Beacon Functions */
     void enableBeacon();
     void disableBeacon();
-    void updateBeacon(std::string str);
+    void updateBeacon(const std::string& str);
     uint8_t getBeaconStatus();
 
     /* Test Functions */

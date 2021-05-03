@@ -96,7 +96,7 @@ int Radio::scan() {
     command_t incoming_command = interpreter->getCommand();
     int status = handler->process(&incoming_command);
 
-    status += updateBeacon();
+    updateBeacon("TEST!");
     return status;
 }
 
@@ -116,7 +116,7 @@ void Radio::disableBeacon() {
     transceiver->disableBeacon();
 }
 
-void Radio::updateBeacon(std::string str) {
+void Radio::updateBeacon(const std::string& str) {
     transceiver->setBeaconOutput(str);
 }
 
@@ -156,7 +156,7 @@ int Radio::test_scan() {
 	struct command_t incoming_command = {TELECOM_DEBUG_TOGGLE, "\0"};
 	int status = handler->process(&incoming_command);
 
-    status += updateBeacon();
+    updateBeacon("TEST!");
     return status;
 }
 

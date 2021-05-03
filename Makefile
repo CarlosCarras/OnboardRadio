@@ -14,6 +14,12 @@ main.o: main.cpp
 Radio.o: Radio.h Radio.cpp
 	$(CCC) $(CPPFLAGS) -c Radio.cpp -o Radio.o
 
+Actions.o: Actions.h Actions.cpp
+	$(CCC) $(CPPFLAGS) -c Actions.cpp -o Actions.o
+
+ManageHistory.o: ManageHistory.h ManageHistory.cpp
+	$(CCC) $(CPPFLAGS) -c ManageHistory.cpp -o ManageHistory.o
+
 Interpreter.o: Interpreter.h Interpreter.cpp
 	$(CCC) $(CPPFLAGS) -c Interpreter.cpp -o Interpreter.o
 
@@ -32,8 +38,8 @@ I2C_Functions.o: I2C_Functions.h I2C_Functions.cpp
 lsquaredc.o: lsquaredc.h lsquaredc.c
 	$(CC) $(CFLAGS) -c lsquaredc.c -o lsquaredc.o
 
-test: lsquaredc.o I2C_Functions.o UHF_Transceiver.o Handler.o Packager.o Interpreter.o Radio.o main.o
-	$(CCC) $(CPPFLAGS) -o test main.o Radio.o Interpreter.o Handler.o Packager.o UHF_Transceiver.o I2C_Functions.o lsquaredc.o
+test: lsquaredc.o I2C_Functions.o UHF_Transceiver.o Handler.o Packager.o Interpreter.o ManageHistory.o Actions.o Radio.o main.o
+	$(CCC) $(CPPFLAGS) -o test main.o Radio.o ManageHistory.o Actions.o Interpreter.o Handler.o Packager.o UHF_Transceiver.o I2C_Functions.o lsquaredc.o
 
 # i2clib.a: libi2c.o
 #	 ar rcs i2clib.a libi2c.o lsquaredc.o

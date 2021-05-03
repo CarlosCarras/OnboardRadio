@@ -12,17 +12,18 @@
 
 #include "Actions.h"
 #include <fstream>
-#include<iostream>
+#include <iostream>
 #include "telecommands.h"
 
 int undoUpload(const std::string& filename) {
     std::string backupname = filename + BACKUP_EXT;
 
     std::ifstream file;
-    if (file.open(backupname)) {
-        remove(filename);
-        rename(backupname, filename);
-        return;
+    file.open(backupname.c_str());
+    if (file.is_open()) {
+        remove(filename.c_str());
+        rename(backupname.c_str(), filename.c_str());
+        return 0;
     }
 
     return -1;

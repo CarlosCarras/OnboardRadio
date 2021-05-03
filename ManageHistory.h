@@ -13,6 +13,8 @@
 #ifndef MANAGEHISTORY_H
 #define MANAGEHISTORY_H
 
+#include "telecommands.h"
+
 #define HISTORY_FILENAME "history.d3"
 #define LEAVE_LAST_N     10
 

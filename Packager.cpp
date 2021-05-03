@@ -40,7 +40,7 @@ int Packager::sendFile(const std::string &filename) {
 
         sendData(TELECOM_DOWNLINK_FILE, buffer);
 
-        return 0
+        return 0;
     }
 
     /* the file was unavailable, sending an error */
@@ -102,15 +102,19 @@ int Packager::getNumPackets(const std::string &data) {
  *
  */
 int Packager::sendData(uint8_t telecom, const std::string &data) {
-    int num_packets = getNumPackets(str);
+    int num_packets = getNumPackets(data);
 
     /* sending the first packet */
+    std::string data_out;
     int first_packet_data_len = DATAFIELD_LEN-3;
-    std::string data_out = (char)telecom + '1' + (char)num_packets + str.substr(0, first_packet_data_len);
+    data_out += (char)telecom;
+    data_out += '1';
+    data_out += (char)num_packets;
+    data_out += data.substr(0, first_packet_data_len);
     send256Bytes(data_out);
 
     for (int i = 0; i < num_packets-1; i++) {
-        data_out = str.substr(i*DATAFIELD_LEN + first_packet_data_len, DATAFIELD_LEN);
+        data_out = data.substr(i*DATAFIELD_LEN + first_packet_data_len, DATAFIELD_LEN);
         send256Bytes(data_out);
     }
 
