@@ -5,7 +5,7 @@
 * @author     : Carlos Carrasquillo
 * @contact    : c.carrasquillo@ufl.edu
 * @date       : February 4, 2021
-* @modified   : February 12, 2021
+* @modified   : May 1, 2021
 *
 * Property of ADAMUS lab, University of Florida.
 ****************************************************************************/
@@ -35,6 +35,7 @@ private:
     void sendSignal(uint8_t signal);
     void acknowledge(void);
     void sendError(void);
+    void sendStatus(uint8_t status);
 
     /* Test Functions */
     void debug_led_on(int led);

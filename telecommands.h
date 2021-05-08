@@ -17,8 +17,11 @@
 #include <stdint.h>
 #include <string>
 
+#define BACKUP_EXT ".backup"
+
 /* Uplinked Commands */
 #define TELECOM_UPLOAD_FILE	         0xF0
+#define TELECOM_UNDO_UPLOAD          0xF5
 #define TELECOM_GET_HISTORY          0x12
 #define TELECOM_GET_HEALTH           0x4C
 #define TELECOM_OVERRIDE_ANTENNA     0x6A
@@ -34,7 +37,7 @@
 
 /* Downlinked Errors */
 #define ERROR                        0x32
-#define TELECOM_PAKCET_LOSS          0xE6
+#define TELECOM_PACKET_LOSS          0xE6
 #define TELECOM_PACKET_LOSS_RESET    0xE7
 #define TELECOM_PACKET_FORMAT_ERR    0xE8
 #define TELECOM_FILE_UNAVAILABLE     0xE9

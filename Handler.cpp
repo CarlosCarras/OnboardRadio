@@ -5,7 +5,7 @@
 * @author     : Carlos Carrasquillo
 * @contact    : c.carrasquillo@ufl.edu
 * @date       : February 4, 2021
-* @modified   : March 19, 2021
+* @modified   : May 1, 2021
 *
 * Property of ADAMUS lab, University of Florida.
 ****************************************************************************/
@@ -42,13 +42,23 @@ void Handler::sendError(void) {
     sendSignal(ERROR);
 }
 
+void Handler::sendStatus(uint8_t status) {
+    if (status < 0) sendError();
+    else            acknowledge();
+}
+
 int Handler::identify_response(command_t* inbound_command) {
     int status = 0;
     uint8_t telecom = inbound_command->telecommand;
+    std::string params = inbound_command->params;
 
     switch(telecom) {
         case TELECOM_UPLOAD_FILE:
             acknowledge();
+            break;
+        case TELECOM_UNDO_UPLOAD:
+            status = undoUpload(params);
+            sendStatus(status);
             break;
         case TELECOM_GET_HISTORY:
             cleanHistory();
@@ -72,7 +82,7 @@ int Handler::identify_response(command_t* inbound_command) {
         case TELECOM_OVERRIDE_ANTENNA:
             acknowledge();
             break;
-        case TELECOM_SEND_ERROR:
+        case ERROR:
             sendError();
             break;
         case TELECOM_PACKET_LOSS:
@@ -81,8 +91,8 @@ int Handler::identify_response(command_t* inbound_command) {
         case TELECOM_PACKET_FORMAT_ERR:
             sendSignal(TELECOM_PACKET_FORMAT_ERR);
             break;
-        case LAST_PACKET_RECEIVED:
-            sendSignal(LAST_PACKET_RECEIVED);
+        case TELECOM_LAST_PACKET_RECEIVED:
+            sendSignal(TELECOM_LAST_PACKET_RECEIVED);
             break;
         default:
             std::cout << "ERROR: Unknown Telecommand." << std::endl;

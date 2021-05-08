@@ -11,15 +11,15 @@
 ****************************************************************************/
 
 #include "ManageHistory.h"
+#include <fstream>
 #include <time.h>
-#include "telecommands.h"
 
 
 void addToHistory(command_t* command) {
     time_t my_time = time(NULL);
 
-    std::ofstream history(HISTORY_FILENAME, ios:app);
-    history << "Telecommand: " << std::hex << static_cast<int>(command->telecommand) << ", Params: " << command->params << ", Time: " << ctime(&my_time) << \n";
+    std::ofstream history(HISTORY_FILENAME, std::ios::app);
+    history << "Telecommand: " << std::hex << static_cast<int>(command->telecommand) << ", Params: " << command->params << ", Time: " << ctime(&my_time) << "\n";
 }
 
 void cleanHistory() {
@@ -34,10 +34,9 @@ void cleanHistory() {
     history.close();
 
     /* deleting all but the last LEAVE_LAST_N files */
-    std::ifstream history;
     history.open(HISTORY_FILENAME);
     std::ofstream tempFile;
-    tempFile.open("temp.txt", ofstream::out);
+    tempFile.open("temp.txt", std::ofstream::out);
 
     while(std::getline(history,line)) {
         if (num_lines - ++line_cntr < LEAVE_LAST_N) {

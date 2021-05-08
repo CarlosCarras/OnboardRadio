@@ -37,8 +37,8 @@ command_t Interpreter::getCommand() {
     inbound_command = composeCommand(&inbound_packet);
     addToHistory(&inbound_command);
 
-    if (incoming_command.telecommand == TELECOM_UPLOAD_FILE) {
-        uploadFile(&incoming_command);
+    if (inbound_command.telecommand == TELECOM_UPLOAD_FILE) {
+        uploadFile(&inbound_command);
     }
 
     return inbound_command;
@@ -64,6 +64,12 @@ command_t Interpreter::composeCommand(packet_t* inbound_packet) {
     return inbound_command;
 }
 
+void Interpreter::backupFile(const std::string& filename) {
+    std::string newname = filename + BACKUP_EXT;
+    remove(newname.c_str());                       // delete the backup file if the backup already exists
+    rename(filename.c_str(), newname.c_str());     // create a new backup file if the file already exists
+}
+
 /*
  * First Packet Params Field:
  * Bytes:   |      1        |       1           |              1              |    1-251    |  1  |  0-250 |
@@ -87,7 +93,6 @@ int Interpreter::uploadFile(command_t* incoming_command) {
             /* this means that not all packets from the last transmission were received */
             std::cout << "ERROR: Not all packets were received. Accepting the new telecommand." << std::endl;
             incoming_command->telecommand = TELECOM_PACKET_LOSS_RESET;
-            last_file.sof = 0x00;
             remove(&last_file.dest[0]);
         }
 
@@ -100,23 +105,25 @@ int Interpreter::uploadFile(command_t* incoming_command) {
         uint8_t startOfData = 3 + last_file.len_dest;
         if (startOfData > DATAFIELD_LEN-1) {
             std::cout << "ERROR: Improper packet format. The data field is said to start at byte " << std::to_string(startOfData) << ", which exceeds " << std::to_string(DATAFIELD_LEN-1) << ". Aborting." << std::endl;
-            incoming_command->telecommand = TELECOM_PACKET_FORMAT_ERROR;
+            incoming_command->telecommand = TELECOM_PACKET_FORMAT_ERR;
             return -1;
         }
 
-        last_file.sof = incoming_command->params.at(startOfData);                   // location of SOF character
-        if (last_file.sof != SOF) {
+        char sof = incoming_command->params.at(startOfData);                        // location of SOF character
+        if (sof != SOF) {
             /* SOF is supposed to by in the first packet but was not found */
             std::cout << "ERROR: Unable to locate the Start of File (SOF) character. Aborting." << std::endl;
-            incoming_command->telecommand = TELECOM_PACKET_FORMAT_ERROR;
+            incoming_command->telecommand = TELECOM_PACKET_FORMAT_ERR;
             return -1;
         }
 
-        std::ofstream newFile(last_file.dest, std::ofstream::trunc);
-        if (!newfile.is_open()) {
+        backupFile(last_file.dest);                                                 // if the file exists, save a backup
+        std::ofstream newFile(last_file.dest.c_str(), std::ofstream::trunc);
+
+        if (!newFile.is_open()) {
             /* The destination was not found. */
             std::cout << "Error: The file destination: '" << last_file.dest << "' was not found." << std::endl;
-            incoming_command->telecommand = TELECOM_PACKET_FORMAT_ERROR;
+            incoming_command->telecommand = TELECOM_PACKET_FORMAT_ERR;
             return -1;
         }
         newFile << incoming_command->params.substr(startOfData+1);
@@ -150,19 +157,49 @@ int Interpreter::uploadFile(command_t* incoming_command) {
         last_packet = true;
     }
 
-    std::ofstream file(last_file.dest);
+    std::ofstream file(last_file.dest.c_str());
     if (!file.is_open()) {
         /* this means that the destination was not found */
         std::cout << "Error: The file destination: '" << last_file.dest << "' was not found." << std::endl;
         incoming_command->telecommand = ERROR;
         return -1;
     }
-    newFile << incoming_command->params.substr(1);
-    newFile.close();
+    file << incoming_command->params.substr(1);
+    file.close();
 
     if (last_packet) {
         incoming_command->telecommand = TELECOM_LAST_PACKET_RECEIVED;
     }
 
     return 0;
+}
+
+
+/********************************** Testing **********************************/
+int lineno = 0;
+
+command_t Interpreter::getCommandTest() {
+    packet_t inbound_packet;
+    command_t inbound_command;
+
+    std::ifstream testFile("output.txt");
+    if(testFile.is_open()) {
+        for (int i = 0; i < lineno; i++) getline(testFile, line);
+        getline(testFile, line);
+        lineno++;
+        testFile.close();
+        int data_len = line.length();
+
+        inbound_packet = composePacket(line, data_len);
+        inbound_command = composeCommand(&inbound_packet);
+        addToHistory(&inbound_command);
+
+        if (inbound_command.telecommand == TELECOM_UPLOAD_FILE) {
+            uploadFile(&inbound_command);
+        }
+
+        return inbound_command;
+    }
+
+    return {0x00, "\0"};
 }
