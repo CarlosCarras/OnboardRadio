@@ -20,14 +20,14 @@
 #define BACKUP_EXT ".backup"
 
 /* Uplinked Commands */
-#define TELECOM_UPLOAD_FILE	         0xF0
+#define TELECOM_UPLOAD_FILE	         0x79
 #define TELECOM_UNDO_UPLOAD          0xF5
 #define TELECOM_GET_HISTORY          0x12
 #define TELECOM_GET_HEALTH           0x4C
 #define TELECOM_OVERRIDE_ANTENNA     0x6A
 #define TELECOM_DEBUG_ON             0xE0
 #define TELECOM_DEBUG_OFF            0x0F
-#define TELECOM_DEBUG_TOGGLE         0xAA
+#define TELECOM_DEBUG_TOGGLE         0x7A
 
 /* Downlinked Commands */
 #define ACKNOWLEDGE                  0x40

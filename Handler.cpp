@@ -76,7 +76,7 @@ int Handler::identify_response(command_t* inbound_command) {
             acknowledge();
             break;
         case TELECOM_DEBUG_TOGGLE:
-            debug_led_off(0);
+            debug_led_toggle(0);
             acknowledge();
             break;
         case TELECOM_OVERRIDE_ANTENNA:
@@ -96,6 +96,7 @@ int Handler::identify_response(command_t* inbound_command) {
             break;
         default:
             std::cout << "ERROR: Unknown Telecommand." << std::endl;
+            sendError();
             return -1;
     }
 

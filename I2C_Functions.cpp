@@ -87,7 +87,6 @@ int I2C_Functions::writen(uint8_t reg, uint8_t* data, int n) {
 }
 
 uint8_t I2C_Functions::read(uint8_t reg) {
-	print_uint8("Write Address", I2CAddr_Write);
 	uint16_t read_sequence[] = {I2CAddr_Write, reg, I2C_RESTART, I2CAddr_Read, I2C_READ};
 	uint8_t data_received[1] = {0};
 

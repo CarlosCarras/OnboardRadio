@@ -31,9 +31,9 @@ void Radio::config() {
     transceiver->setPAPower(pa_pwr_lvl);
     transceiver->setRxFreq(FREQ_VAL);
     transceiver->setTxFreq(FREQ_VAL);
-    transceiver->setMode(0);
+    transceiver->setMode(AX25_MODE);
 
-    resolveLock();
+    // resolveLock();
 }
 
 void Radio::configBeacon() {
@@ -43,8 +43,9 @@ void Radio::configBeacon() {
 
 int Radio::resolveLock() {
     int cntr = 0;
-    while (transceiver->testLocks() || cntr++ < 10) {
-        sleep(0.05);
+    while (!transceiver->testLocks() && cntr < 10) {
+        sleep(0.15);
+        cntr++;
     }
     if (cntr >= 10) return -1;  // unable to establish frequency lock
     return 0;                   // frequency locked
@@ -71,7 +72,7 @@ void Radio::healthCheck() {
     }
 
     cnt_since_healthcheck = 0;
-    resolveLock();
+    // resolveLock();
 }
 
 uint8_t Radio::getPowerLevel() {
@@ -96,7 +97,8 @@ int Radio::scan() {
     command_t incoming_command = interpreter->getCommand();
     int status = handler->process(&incoming_command);
 
-    updateBeacon("TEST!");
+    std::string beacon_msg = "TEST!";
+    updateBeacon(beacon_msg);
     return status;
 }
 
@@ -155,8 +157,9 @@ int Radio::test_scan() {
 
 	command_t incoming_command = interpreter->getCommandTest();
 	int status = handler->process(&incoming_command);
-
-    updateBeacon("TEST!");
+    
+    std::string beacon_msg = "TEST!";
+    updateBeacon(beacon_msg);
     return status;
 }
 

@@ -11,22 +11,22 @@ all: test
 main.o: main.cpp
 	$(CCC) $(CPPFLAGS) -c main.cpp -o main.o
 
-Radio.o: Radio.h Radio.cpp
+Radio.o: Radio.h Radio.cpp telecommands.h
 	$(CCC) $(CPPFLAGS) -c Radio.cpp -o Radio.o
 
-Actions.o: Actions.h Actions.cpp
+Actions.o: Actions.h Actions.cpp telecommands.h
 	$(CCC) $(CPPFLAGS) -c Actions.cpp -o Actions.o
 
-ManageHistory.o: ManageHistory.h ManageHistory.cpp
+ManageHistory.o: ManageHistory.h ManageHistory.cpp telecommands.h
 	$(CCC) $(CPPFLAGS) -c ManageHistory.cpp -o ManageHistory.o
 
-Interpreter.o: Interpreter.h Interpreter.cpp
+Interpreter.o: Interpreter.h Interpreter.cpp telecommands.h
 	$(CCC) $(CPPFLAGS) -c Interpreter.cpp -o Interpreter.o
 
-Handler.o: Handler.h Handler.cpp
+Handler.o: Handler.h Handler.cpp telecommands.h
 	$(CCC) $(CPPFLAGS) -c Handler.cpp -o Handler.o
 
-Packager.o: Packager.h Packager.cpp
+Packager.o: Packager.h Packager.cpp telecommands.h
 	$(CCC) $(CPPFLAGS) -c Packager.cpp -o Packager.o
 
 UHF_Transceiver.o: UHF_Transceiver.h UHF_Transceiver.cpp

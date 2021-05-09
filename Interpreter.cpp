@@ -49,7 +49,7 @@ packet_t Interpreter::composePacket(uint8_t* data_arr, int n) {
 
     packet_t inbound_packet;
     inbound_packet.preamble = (data_arr[0] << 8) | (data_arr[1] & 0xFF);
-    inbound_packet.data_length = n-5;
+    inbound_packet.data_length = n-4;
     inbound_packet.data = data.substr(3,inbound_packet.data_length);
     inbound_packet.checksum = data_arr[n-1];
 
@@ -85,6 +85,10 @@ void Interpreter::backupFile(const std::string& filename) {
  */
 int Interpreter::uploadFile(command_t* incoming_command) {
     bool last_packet = false;
+
+    printf("First Char: '%d'\n", (int)incoming_command->params.at(0));
+    printf("Num Packets: '%d'\n", (int)incoming_command->params.at(1));
+    printf("Length of Dest: '%d'\n", (int)incoming_command->params.at(2));
 
     if (incoming_command->params.at(0) == 1) {
         /* this means that the transmission is a new transmission */
@@ -137,12 +141,6 @@ int Interpreter::uploadFile(command_t* incoming_command) {
         return -1;
     }
 
-    if (incoming_command->params.at(0) != ++packet_cntr) {
-        std::cout << "ERROR: Packet number " << packet_cntr << " was lost." << std::endl;
-        incoming_command->telecommand = TELECOM_PACKET_LOSS;
-        return -1;
-    }
-
     if (packet_cntr > last_file.num_packets) {
         std::cout << "ERROR: Unexpected number of packets received. Expected " << std::to_string(last_file.num_packets) << ", Received: " << std::to_string(packet_cntr) << "." << std::endl;
         incoming_command->telecommand = ERROR;
@@ -157,7 +155,13 @@ int Interpreter::uploadFile(command_t* incoming_command) {
         last_packet = true;
     }
 
-    std::ofstream file(last_file.dest.c_str());
+    if (incoming_command->params.at(0) != ++packet_cntr) {
+        std::cout << "ERROR: Packet number " << std::to_string(packet_cntr) << " was lost." << std::endl;
+        incoming_command->telecommand = TELECOM_PACKET_LOSS;
+        return -1;
+    }
+
+    std::ofstream file(last_file.dest.c_str(), std::ofstream::app);
     if (!file.is_open()) {
         /* this means that the destination was not found */
         std::cout << "Error: The file destination: '" << last_file.dest << "' was not found." << std::endl;
@@ -177,6 +181,8 @@ int Interpreter::uploadFile(command_t* incoming_command) {
 
 /********************************** Testing **********************************/
 int lineno = 0;
+#include <algorithm>
+#include <vector>
 
 command_t Interpreter::getCommandTest() {
     packet_t inbound_packet;
@@ -184,13 +190,19 @@ command_t Interpreter::getCommandTest() {
 
     std::ifstream testFile("output.txt");
     if(testFile.is_open()) {
+        std::string line;
         for (int i = 0; i < lineno; i++) getline(testFile, line);
         getline(testFile, line);
         lineno++;
         testFile.close();
-        int data_len = line.length();
 
-        inbound_packet = composePacket(line, data_len);
+        if (line.back() == '\015')   // if char is carriage return (fix for windows)
+            line.pop_back();
+        int data_len = line.length();
+        std::vector<uint8_t> temp(line.begin(), line.end());
+        uint8_t *data = &temp[0];
+
+        inbound_packet = composePacket(data, data_len);
         inbound_command = composeCommand(&inbound_packet);
         addToHistory(&inbound_command);
 

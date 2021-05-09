@@ -142,11 +142,12 @@ void UHF_Transceiver::setBeaconData(uint8_t data) {
 }
 
 void UHF_Transceiver::setBeaconOutput(std::string str) {
-	if (str.length() > BEACON_DATA_BUFFER_LEN) {
+	int str_len = str.length();
+	if (str_len > BEACON_DATA_BUFFER_LEN) {
 		str = str.substr(0, BEACON_DATA_BUFFER_LEN);
 	}
 
-	for (int i = 0; i < BEACON_DATA_BUFFER_LEN; i++) {
+	for (int i = 0; i < str_len; i++) {
 		setBeaconData(str.at(i));
 	}
 }
@@ -203,8 +204,9 @@ uint16_t UHF_Transceiver::getRxFreqOffset() {
 }
 
 void UHF_Transceiver::setRxFreqOffset(uint16_t offset) {
+	printf("Frequency Offset: %d\n", offset);
 	if (offset > 1023) {
-		printe("Rx frequency offset is larger than 511.");
+		printe("Rx frequency offset is larger than 1023.");
 	}
 	i2c.write2(RX_OFFSET, offset);
 }
@@ -219,7 +221,7 @@ void UHF_Transceiver::setRxFreq(float freq) {
 
 float UHF_Transceiver::getRxFreq() {
 	uint16_t offset = getRxFreqOffset();
-	float freq = (offset + 430) * 0.0125;												// pp. 22
+	float freq = (offset * 0.0125) + 430;												// pp. 22
 	return freq;
 }
 
@@ -246,7 +248,7 @@ void UHF_Transceiver::setTxFreq(float freq) {
 
 float UHF_Transceiver::getTxFreq() {
 	uint16_t offset = getTxFreqOffset();
-	float freq = (offset + 430) * 0.025;												// pp. 22
+	float freq = (offset * 0.025) + 430;												// pp. 22
 	return freq;
 }
 
