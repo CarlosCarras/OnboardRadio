@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 
     while(1) {
             // radio.sendString("This is a test!");
-            radio.test_scan();
+            radio.scan();		// radio.test_scan();
             sleep(1);
     }
 
