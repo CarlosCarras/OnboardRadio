@@ -108,7 +108,7 @@ int Packager::sendData(uint8_t telecom, const std::string &data) {
     std::string data_out;
     int first_packet_data_len = DATAFIELD_LEN-3;
     data_out += (char)telecom;
-    data_out += '1';
+    data_out += (char)1;
     data_out += (char)num_packets;
     data_out += data.substr(0, first_packet_data_len);
     send256Bytes(data_out);

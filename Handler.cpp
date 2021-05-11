@@ -95,7 +95,6 @@ int Handler::identify_response(command_t* inbound_command) {
             sendSignal(TELECOM_LAST_PACKET_RECEIVED);
             break;
         default:
-            std::cout << "ERROR: Unknown Telecommand." << std::endl;
             return -1;
     }
 
