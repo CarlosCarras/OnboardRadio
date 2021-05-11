@@ -9,15 +9,15 @@ read -p 'LED to Turn On: ' led
 case "$led" in
   "0")
     echo "Turning on LED 0."
-    cmd=0b01
+    cmd=0x01
     ;;
   "1")
     echo "Turning on LED 1."
-    cmd=0b10
+    cmd=0x02
     ;;
   "2")
     echo "Turning on LEDs 0 and 1."
-    cmd=0b11
+    cmd=0x03
     ;;
   *)
     echo "Invalid LED."

@@ -21,7 +21,7 @@
 
 #define MODEM_CONFIG_VAL            MODEM_GMSK_BOTH
 #define PA_POWER_VAL                PA_LVL_27
-#define FREQ_VAL		            437.08		    // MHz
+#define FREQ_VAL		            437.08		      // MHz
 #define BEACON_INIT_TIMEOUT         5                 // 5 minutes
 #define BEACON_RECURRING_TIMEOUT    120               // 120 seconds
 #define CHECK_HEALTH_EVERY_N_SCANS  10

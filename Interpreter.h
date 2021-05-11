@@ -36,6 +36,9 @@ private:
 public:
     explicit Interpreter(UHF_Transceiver* transceiver);
     command_t getCommand();
+
+    /****** Testing ******/
+    command_t getCommandTest();
 };
 
 #endif //INTERPRETER_H
