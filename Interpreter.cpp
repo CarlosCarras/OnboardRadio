@@ -70,6 +70,12 @@ void Interpreter::backupFile(const std::string& filename) {
     rename(filename.c_str(), newname.c_str());     // create a new backup file if the file already exists
 }
 
+void Interpreter::restoreBackup(const std::string& filename) {
+    std::string backupname = filename + BACKUP_EXT;
+    remove(filename.c_str());
+    rename(backupname.c_str(), filename.c_str());
+}
+
 /*
  * First Packet Params Field:
  * Bytes:   |      1        |       1           |              1              |    1-251    |  1  |  0-250 |
@@ -97,7 +103,7 @@ int Interpreter::uploadFile(command_t* incoming_command) {
             /* this means that not all packets from the last transmission were received */
             std::cout << "ERROR: Not all packets were received. Accepting the new telecommand." << std::endl;
             incoming_command->telecommand = TELECOM_PACKET_LOSS_RESET;
-            remove(&last_file.dest[0]);
+            restoreBackup(last_file.dest);
         }
 
         packet_cntr = 1;
