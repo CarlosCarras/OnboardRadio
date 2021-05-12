@@ -56,6 +56,9 @@ int Handler::identify_response(command_t* inbound_command) {
         case TELECOM_UPLOAD_FILE:
             acknowledge();
             break;
+        case TELECOM_GET_FILE:
+            sendFile(params);
+            break;
         case TELECOM_UNDO_UPLOAD:
             status = undoUpload(params);
             sendStatus(status);

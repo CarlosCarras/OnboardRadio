@@ -21,6 +21,7 @@
 
 /* Uplinked Commands */
 #define TELECOM_UPLOAD_FILE	         0x79
+#define TELECOM_GET_FILE             0x81
 #define TELECOM_UNDO_UPLOAD          0xF5
 #define TELECOM_GET_HISTORY          0x12
 #define TELECOM_GET_HEALTH           0x4C
