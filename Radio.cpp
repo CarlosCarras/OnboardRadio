@@ -127,6 +127,7 @@ void Radio::updateBeaconCSV(const std::string& filename) {
     std::ifstream ifs(filename);
     std::string content((std::istreambuf_iterator<char>(ifs)),
                         (std::istreambuf_iterator<char>()));
+    content = content.substr(0,256);
     updateBeacon(content);
 }
 
