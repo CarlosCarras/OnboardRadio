@@ -43,7 +43,7 @@ private:
 public:
     explicit Radio();
     void healthCheck();
-    uint8_t getPowerLevel();
+    uint8_t getPowerLevel() const;
     void setPowerLevel(uint8_t pa_pwr_lvl);
     void enableRadio();
     void disableRadio();
@@ -54,6 +54,7 @@ public:
     void enableBeacon();
     void disableBeacon();
     void updateBeacon(const std::string& str);
+    void updateBeaconCSV(const std::string& filename);
     uint8_t getBeaconStatus();
 
     /* Test Functions */

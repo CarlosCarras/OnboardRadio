@@ -12,6 +12,7 @@
 
 #include "Radio.h"
 #include "telecommands.h"
+#include<fstream>
 
 
 Radio::Radio() {
@@ -75,7 +76,7 @@ void Radio::healthCheck() {
     // resolveLock();
 }
 
-uint8_t Radio::getPowerLevel() {
+uint8_t Radio::getPowerLevel() const {
     return pa_pwr_lvl;
 }
 
@@ -120,6 +121,13 @@ void Radio::disableBeacon() {
 
 void Radio::updateBeacon(const std::string& str) {
     transceiver->setBeaconOutput(str);
+}
+
+void Radio::updateBeaconCSV(const std::string& filename) {
+    std::ifstream ifs(filename);
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                        (std::istreambuf_iterator<char>()));
+    updateBeacon(content);
 }
 
 uint8_t Radio::getBeaconStatus() {
