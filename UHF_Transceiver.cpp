@@ -130,11 +130,11 @@ void UHF_Transceiver::beaconEnable(bool enable) {
 }
 
 void UHF_Transceiver::enableBeacon() {
-	beaconEnable(1);
+	beaconEnable(true);
 }
 
 void UHF_Transceiver::disableBeacon() {
-	beaconEnable(0);
+	beaconEnable(false);
 }
 
 void UHF_Transceiver::setBeaconData(uint8_t data) {
@@ -147,6 +147,7 @@ void UHF_Transceiver::setBeaconOutput(std::string str) {
 		str = str.substr(0, BEACON_DATA_BUFFER_LEN);
 	}
 
+    clearBeaconData();
 	for (int i = 0; i < str_len; i++) {
 		setBeaconData(str.at(i));
 	}
